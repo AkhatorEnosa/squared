@@ -1,6 +1,8 @@
 import React from 'react'
 import { Tabs } from 'expo-router'
-import { Entypo, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Entypo, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Image } from 'react-native';
+import { COLORS } from '@/constants/colors';
 
 const TabsLayout = () => {
   return (
@@ -8,16 +10,19 @@ const TabsLayout = () => {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#019874',
-        // tabBarStyle: {
-        //   backgroundColor: COLORS.white,
-        //   borderTopColor: COLORS.border,
-        //   borderTopWidth: 1,
-        //   height: 60,
-        //   paddingTop: 8,
-        // },
+        tabBarInactiveTintColor: '#5F5F5F',
+        tabBarStyle: {
+          paddingTop: 8,
+          paddingBottom: 0,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          boxShadow: `0 0 5px ${COLORS.shadow}`,
+          position: 'absolute',
+        },
         tabBarLabelStyle: {
-          fontSize: 16,
-          fontWeight: '600'
+          fontSize: 14,
+          fontWeight: '600',
+          marginTop: -2,
         }
       }}
     >
@@ -43,8 +48,20 @@ const TabsLayout = () => {
         name='profile'
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} /> 
-        }} />
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={require('../../assets/images/appImages/profilepic.png')}        // active icon
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                borderWidth: focused ? 2 : 0,
+                borderColor: focused ? '#019874' : 'transparent',
+              }}
+              />
+            )
+        }}
+        />
     </Tabs>
   )
 }
