@@ -28,12 +28,11 @@ const Header = ({ title, icon }: {title: string, icon?: boolean}) => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: `${COLORS.white}`, 
+    backgroundColor: `${COLORS.white}`,
+    paddingVertical: 30,
     paddingHorizontal: 15,
-    paddingTop: 30,
   },
   headerContainer: {
-    height: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
