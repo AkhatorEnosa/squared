@@ -5,9 +5,9 @@ import { Link } from 'expo-router'
 
 const Post = () => {
   return (
-    <TouchableOpacity style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, backgroundColor: COLORS.secondary, borderRadius: 20 }}>
-        <View style={{ justifyContent: "space-between", flexDirection: "row", marginBottom: 12 }}>
-            <Link href={"/"} style={{ fontSize: 10, fontWeight: "bold" }}>Why I code only in the morning</Link>
+    <TouchableOpacity style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, backgroundColor: COLORS.secondary, borderRadius: 20 }}>
+        <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
+            <Link href={"/"} style={{ fontSize: 10, fontWeight: "bold", textDecorationLine: 'underline' }}>Why I code only in the morning</Link>
             <Text style={{ fontSize: 8, color: COLORS.textLight }}>Feb. 24th, 2021</Text>
         </View>
         

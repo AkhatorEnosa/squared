@@ -25,7 +25,8 @@ const Home = () => {
           </Text>
           <Featured />
 
-          <View style={{ gap: 20, marginTop: 10, marginBottom: 30 }}>
+          <View style={{ gap: 10, marginTop: 10, marginBottom: 30 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text }}>Recent</Text>
             {spool.map((x) => (
               <Post key={x}/>
             ) ) }

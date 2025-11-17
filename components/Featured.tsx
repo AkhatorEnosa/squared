@@ -4,7 +4,7 @@ import { COLORS } from '@/constants/colors'
 
 const Featured = () => {
   return (
-    <TouchableOpacity style={{ backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center', borderRadius: 20, padding: 12, gap: 20 }}>
+    <TouchableOpacity style={{ backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center', boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, borderRadius: 20, padding: 12, gap: 20 }}>
         <View style={{ width: '100%', height: 290, borderRadius: 20, overflow: 'hidden' }}>
             <Image
                 source={require('../assets/images/appImages/featured.png')} 
@@ -25,6 +25,34 @@ const Featured = () => {
             <Text style={{ fontSize: 12, color: COLORS.text }}>
                 This is a brief description of the featured post to give users an idea of the content.
             </Text>
+        </View>
+        
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
+                    <Image 
+                        source={require('../assets/icons/comment.png')}
+                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
+                    />
+                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
+                    <Image 
+                        source={require('../assets/icons/heart-liked.png')}
+                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
+                    />
+                    <Text style={{ fontSize: 8, color: COLORS.accent, fontWeight: 'medium' }}>800</Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
+                    <Image 
+                        source={require('../assets/icons/eye.png')}
+                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
+                    />
+                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
+                </View>
+            </View>
+
+            <Text style={{ fontSize: 10, fontWeight: "semibold", color: COLORS.textLight }}>40 mins ago</Text>  
         </View>
     </TouchableOpacity>
   )
