@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router'
 import { Entypo, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
+import Header from '@/components/Header';
 
 const TabsLayout = () => {
   return (
@@ -12,8 +13,6 @@ const TabsLayout = () => {
         tabBarActiveTintColor: '#019874',
         tabBarInactiveTintColor: '#5F5F5F',
         tabBarStyle: {
-          paddingTop: 8,
-          paddingBottom: 0,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           boxShadow: `0 0 5px ${COLORS.shadow}`,
