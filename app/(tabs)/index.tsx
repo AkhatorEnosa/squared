@@ -11,7 +11,7 @@ const Home = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <Header title="Home" icon={true} />
+      <Header title="Home" icon={true} identification={false} />
       
       <ScrollView
         contentContainerStyle={{
