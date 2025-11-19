@@ -33,7 +33,7 @@ const Header = ({ title, icon, identification }: {title?: string, icon?: boolean
                 <Link href="/(auth)/login" style={{ fontSize: 15, fontWeight: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
                     Login
                 </Link>
-                <Link href="/(auth)/login" style={{ fontSize: 15, fontWeight: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
+                <Link href="/(auth)/register" style={{ fontSize: 15, fontWeight: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
                     Register
                 </Link>
             </View>
