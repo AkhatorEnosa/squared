@@ -1,5 +1,6 @@
 // components/CustomHeader.js
 import { COLORS } from '@/constants/colors';
+import { SIZES } from '@/constants/sizes';
 import { Link } from 'expo-router';
 import React from 'react';
 import { View, Text, StyleSheet, Platform, SafeAreaView, Image } from 'react-native';
@@ -30,10 +31,10 @@ const Header = ({ title, icon, identification }: {title?: string, icon?: boolean
         {
             identification &&
             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
-                <Link href="/(auth)/login" style={{ fontSize: 15, fontWeight: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
+                <Link href="/(auth)/login" style={{ fontSize: SIZES.font, fontFamily: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
                     Login
                 </Link>
-                <Link href="/(auth)/register" style={{ fontSize: 15, fontWeight: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
+                <Link href="/(auth)/register" style={{ fontSize: SIZES.font, fontFamily: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
                     Register
                 </Link>
             </View>
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: COLORS.text,
     fontSize: 15,
-    fontWeight: 'semibold',
+    fontFamily: "semibold"
   },
 });
 

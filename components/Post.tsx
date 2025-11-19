@@ -1,17 +1,20 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import { Link } from 'expo-router'
+import { SIZES } from '@/constants/sizes'
+import { Eye, Heart, MessageCircle } from 'lucide-react-native'
 
 const Post = () => {
+    const [ liked, setLiked ] = useState<boolean>(false)
   return (
-    <TouchableOpacity style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, backgroundColor: COLORS.secondary, borderRadius: 20 }}>
-        <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
-            <Link href={"/"} style={{ fontSize: 10, fontWeight: "bold", textDecorationLine: 'underline' }}>Why I code only in the morning</Link>
-            <Text style={{ fontSize: 8, color: COLORS.textLight }}>Feb. 24th, 2021</Text>
+    <View style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, backgroundColor: COLORS.gray, borderRadius: 20 }}>
+          <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: 'center' }}>
+            <Link href={"/"} style={{ fontSize: SIZES.body5, textDecorationLine: 'underline', fontFamily: "bold" }}>Why I code only in the morning</Link>
+            <Text style={{ fontSize: 10, color: COLORS.textLight, fontFamily: "regular" }}>Feb. 24th, 2021</Text>
         </View>
         
-        <Text style={{ fontSize: 10, color: COLORS.text }}>
+        <Text style={{ fontSize: SIZES.body5, color: COLORS.text, fontFamily: "regular" }}>
             I only code in the morning because that&apos;s when my cognitive function peaks. My brain is clearest and least distracted, enabling me to focus on deep work, such as designing complex architecture and solving difficult bugs. This focused effort ensures high-quality output and ...
         </Text>
         
@@ -21,34 +24,29 @@ const Post = () => {
                     source={require('../assets/images/appImages/profilepic.png')}
                     style={{ width: 20, height: 20, borderRadius: 20, resizeMode: 'cover' }}
                 />
-                <Text style={{ fontSize: 10, color: COLORS.textLight }}>Sam Cook</Text>
+                <Text style={{ fontSize: SIZES.body5, color: COLORS.textLight, fontFamily: "semibold" }}>Sam Cook</Text>
             </View>
             
             <View style={{ flexDirection: 'row', gap: 10 }}>
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Image 
-                        source={require('../assets/icons/comment.png')}
-                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
-                    />
-                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
+                    <MessageCircle size={SIZES.font}/>
+                    <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
                 </View>
+                <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => setLiked(!liked)}>
+                    {
+                        liked ?  
+                            <Heart size={SIZES.font} fill={COLORS.accent} stroke={COLORS.accent} /> :
+                            <Heart size={SIZES.font} /> 
+                    }
+                      <Text style={{ fontSize: SIZES.font, color: liked ? COLORS.accent : COLORS.textLight , fontWeight: 'medium' }}>800</Text>
+                </TouchableOpacity>
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Image 
-                        source={require('../assets/icons/heart.png')}
-                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
-                    />
-                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>800</Text>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Image 
-                        source={require('../assets/icons/eye.png')}
-                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
-                    />
-                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
+                    <Eye size={SIZES.font} />
+                    <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
                 </View>
             </View>
         </View>
-    </TouchableOpacity>
+    </View>
   )
 }
 

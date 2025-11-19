@@ -3,6 +3,7 @@ import React from 'react'
 import { COLORS } from '@/constants/colors'
 import Header from '@/components/Header'
 import Post from '@/components/Post'
+import { SIZES } from '@/constants/sizes'
 
 const Welcome = () => {
     const spool = Array.from({ length: 20 }, (_, i) => i)
@@ -20,7 +21,7 @@ const Welcome = () => {
             gap: 10
           }}
         >
-            <Text style={{ fontSize: 15, fontWeight: "bold", }}>Hot Topics</Text>
+            <Text style={{ fontSize: SIZES.h4, fontFamily: "bold", }}>Hot Topics</Text>
             
             <View style={{ flex: 1, justifyContent: 'center', gap: 20 }}>
                 {spool.map((x) => (
