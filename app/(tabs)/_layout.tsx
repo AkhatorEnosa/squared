@@ -3,32 +3,49 @@ import { Tabs } from 'expo-router'
 import { Entypo, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
+import { BlurView } from 'expo-blur';
 
 const TabsLayout = () => {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#019874',
-        tabBarInactiveTintColor: '#5F5F5F',
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.textLight,
         tabBarStyle: {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           boxShadow: `0 0 5px ${COLORS.shadow}`,
-          // position: 'absolute',
+          position: 'absolute',
         },
         tabBarLabelStyle: {
           fontSize: 14,
           fontWeight: '600',
           marginTop: -2,
-        }
+          fontFamily: 'semibold'
+        },
+        tabBarBadgeStyle: {
+          color: COLORS.white,
+          backgroundColor: COLORS.primary,
+          borderWidth: 1,
+          borderColor: COLORS.white
+        },
+        tabBarBackground: () => (
+          <BlurView tint="light" intensity={100}
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            }}
+          />
+        ),
+        animation: "shift"
       }}
     >
       <Tabs.Screen
         name='index'
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => <Entypo name="home" size={size} color={color} /> 
+          tabBarIcon: ({ color, size }) => <Entypo name="home" size={size} color={color} />
         }} />
       <Tabs.Screen
         name='write'
@@ -40,7 +57,8 @@ const TabsLayout = () => {
         name='notifications'
         options={{
           title: "Notifications",
-          tabBarIcon: ({ color, size }) => <MaterialIcons name="notifications" size={size} color={color} /> 
+          tabBarIcon: ({ color, size }) => <MaterialIcons name="notifications" size={size} color={color} />,
+          tabBarBadge: 3,
         }} />
       <Tabs.Screen
         name='profile'

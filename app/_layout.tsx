@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider,  } from "@tanstack/react-query";
 import SafeScreen from "@/components/SafeScreen";
 import { SplashScreen, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -5,6 +6,8 @@ import * as Font from 'expo-font';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -49,8 +52,10 @@ export default function RootLayout() {
     return null;
   }
   return (
-    <SafeScreen>
-      <Stack screenOptions={{ headerShown: false  }}/>
-    </SafeScreen>
+    <QueryClientProvider client={queryClient}>
+      <SafeScreen>
+        <Stack screenOptions={{ headerShown: false  }}/>
+      </SafeScreen>
+    </QueryClientProvider>
   )
 }
