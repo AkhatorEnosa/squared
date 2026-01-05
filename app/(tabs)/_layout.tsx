@@ -1,11 +1,23 @@
-import React from 'react'
-import { Tabs } from 'expo-router'
+import React, { useContext, useEffect } from 'react'
+import { Tabs, useRouter } from 'expo-router'
 import { Entypo, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { BlurView } from 'expo-blur';
+import { AuthContext } from '@/context/AuthContext';
 
 const TabsLayout = () => {
+  const { userToken } = useContext(AuthContext)
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!userToken) {
+      // Redirect to the login page if the user is not authenticated
+      router.replace('/(auth)/login');
+    }
+  }, [userToken]);
+  
+  
   return (
     <Tabs
       screenOptions={{

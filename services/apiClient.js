@@ -11,7 +11,7 @@ const API_URL = Platform.OS === 'android' ? `http://${debuggerHost}:3000` : 'htt
 console.log("Connecting to:", API_URL);
 
 export const apiClient = async (endpoint, options = {}) => {
-  const token = await AsyncStorage.getItem('userToken');
+  const token = Platform.OS === await AsyncStorage.getItem('userToken');
 
   // default headers
   const headers = {

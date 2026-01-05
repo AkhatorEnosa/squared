@@ -1,10 +1,20 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { COLORS } from '@/constants/colors'
+import { AuthContext } from '@/context/AuthContext';
+import { useRouter } from 'expo-router';
 
 const Featured = () => {
+    const router = useRouter();
+    const { logout } = useContext(AuthContext);
+
+    const logoutUser = () => {
+        logout();
+        console.log('User logged out, token removed.');
+         router.replace('/');
+    };
   return (
-    <TouchableOpacity style={{ backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center', boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, borderRadius: 20, padding: 12, gap: 20 }}>
+    <TouchableOpacity style={{ backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center', boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, borderRadius: 20, padding: 12, gap: 20 }} onPress={() => logoutUser()}>
         <View style={{ width: '100%', height: 290, borderRadius: 20, overflow: 'hidden' }}>
             <Image
                 source={require('../assets/images/appImages/featured.png')} 

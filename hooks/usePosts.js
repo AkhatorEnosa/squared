@@ -9,6 +9,10 @@ export const usePosts = () => {
         return useQuery({
             queryKey: ["posts"],
             queryFn: async () => apiClient("/posts"),
+            initialData: [],
+            refetchOnReconnect: true,
+            refetchIntervalInBackground: true,
+            retry: 1,
         })
     }
 

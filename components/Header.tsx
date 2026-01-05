@@ -2,10 +2,14 @@
 import { COLORS } from '@/constants/colors';
 import { SIZES } from '@/constants/sizes';
 import { Link } from 'expo-router';
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '@/context/AuthContext';
 import { View, Text, StyleSheet, Platform, SafeAreaView, Image } from 'react-native';
 
-const Header = ({ title, icon, identification }: {title?: string, icon?: boolean, identification: boolean}) => {
+const Header = ({ title, icon, identification }: { title?: string, icon?: boolean, identification: boolean }) => {
+  
+  const { userToken } = useContext(AuthContext)
+  
   return (
     // Use SafeAreaView to handle the notch and status bar area
     <SafeAreaView style={styles.safeArea}>
@@ -29,7 +33,7 @@ const Header = ({ title, icon, identification }: {title?: string, icon?: boolean
         }
         
         {
-            identification &&
+            !userToken && identification &&
             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
                 <Link href="/(auth)/login" style={{ fontSize: SIZES.font, fontFamily: 'semibold', color: COLORS.primary, textDecorationLine: 'underline' }}>
                     Login

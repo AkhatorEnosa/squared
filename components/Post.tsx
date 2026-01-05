@@ -27,7 +27,7 @@ const Post = ({ post }: { post: PostType }) => {
         return dist + ' ago';
     }
   return (
-    <View style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, backgroundColor: COLORS.gray, borderRadius: 20 }}>
+    <View style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, backgroundColor: COLORS.secondary, borderRadius: 20 }}>
         <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: 'center' }}>
             <Link href={"/"} style={{ fontSize: SIZES.body5, textDecorationLine: 'underline', fontFamily: "bold" }}>{ post.title }</Link>
               <Text style={{ fontSize: 10, color: COLORS.textLight, fontFamily: "regular" }}>
@@ -35,6 +35,9 @@ const Post = ({ post }: { post: PostType }) => {
         </View>
           
         <View style={{ width: '100%', flex: 1, gap: 10, overflow: 'hidden' }}>
+            <Text style={{width: '100%', fontSize: SIZES.body5, color: COLORS.text, fontFamily: "regular" }}>
+                {post.content}
+            </Text>
             {post.imageUrl && 
                  <View style={{ width: '100%', height: 290, borderRadius: 20, borderColor: COLORS.shadow, borderWidth: 1, overflow: 'hidden' }}>
                     <Image
@@ -43,9 +46,6 @@ const Post = ({ post }: { post: PostType }) => {
                     />
                  </View>
             }
-            <Text style={{width: '100%', fontSize: SIZES.body5, color: COLORS.text, fontFamily: "regular" }}>
-                {post.content}
-            </Text>
         </View>
         
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>

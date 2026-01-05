@@ -1,22 +1,42 @@
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native'
-import React from 'react'
+import { View, Text, ScrollView, ActivityIndicator, Platform, RefreshControl } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import Header from '@/components/Header'
 import Post from '@/components/Post'
 import { SIZES } from '@/constants/sizes'
 import { usePosts } from '@/hooks/usePosts'
 import { PostType } from '@/types/PostType'
+import { AuthContext } from '@/context/AuthContext'
+import { useRouter } from 'expo-router'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import NoPost from '@/components/NoPost'
 
 const Welcome = () => {
-  // const spool = Array.from({ length: 20 }, (_, i) => i)
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { userToken, loading } = useContext(AuthContext)
+  const router = useRouter()
   
-  const { useGetPosts } = usePosts()
+  const { useGetPosts, invalidatePosts } = usePosts()
 
   const { data: posts, isLoading, isError, error } = useGetPosts()
+
+  useEffect(() => {
+    if (userToken) {
+      router.replace('/(tabs)')
+    }
+  }, [userToken, loading])
+
+  // on Refresh 
+  const onRefresh = () => {
+    setIsRefreshing(true);
+
+    // invalidate posts
+    invalidatePosts()
+    setIsRefreshing(false);
+  }
   
   // Handle loading state
-  if (isLoading) {
-    // console.log('Loading posts...', posts)
+  if (isLoading || loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
         <ActivityIndicator size="large" />
@@ -42,7 +62,18 @@ const Welcome = () => {
             flexGrow: 1,
             gap: 10
           }}
-        >
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+              colors={[COLORS.primary]}
+            />
+          }
+      >
+        {!posts || posts.length === 0 ? 
+          <NoPost /> :
+          <>
             <Text style={{ fontSize: SIZES.h4, fontFamily: "bold", }}>Hot Topics</Text>
 
             <View style={{ flex: 1, gap: 20 }}>
@@ -50,12 +81,8 @@ const Welcome = () => {
                     <Post key={post.id} post={post} />
                 ))}
             </View>
-        
-            {/* <View style={{ flex: 1, justifyContent: 'center', gap: 20 }}>
-                {spool.map((x) => (
-                    <Post key={x}/>
-                ))}
-            </View> */}
+          </>
+        }
         </ScrollView>
     </View>
   )
