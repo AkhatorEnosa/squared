@@ -7,6 +7,7 @@ import { Link } from 'expo-router'
 import { SIZES } from '@/constants/sizes'
 import { Eye, Heart, MessageCircle } from 'lucide-react-native'
 import { PostType } from '@/types/PostType'
+import { SvgUri } from 'react-native-svg';
 
 const Post = ({ post }: { post: PostType }) => {
     const [liked, setLiked] = useState<boolean>(false)
@@ -50,10 +51,16 @@ const Post = ({ post }: { post: PostType }) => {
         
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', gap: 8.66, alignItems: 'center' }}>
-                <Image 
-                    source={require('../assets/images/appImages/profilepic.png')}
+                {/* <Image 
+                    source={{ uri: 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + post.author.name }}
                     style={{ width: 20, height: 20, borderRadius: 20, resizeMode: 'cover' }}
-                />
+                  /> */}
+                  <View style={{ width: 20, height: 20, borderRadius: 20, overflow: 'hidden', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, justifyContent: 'center', alignItems: 'center' }}>
+                    <SvgUri
+                        style={{ width: 20, height: 20, borderRadius: 20 }}
+                        uri={post?.author.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + post.author.name}
+                      />
+                    </View>
                   <Text style={{ fontSize: SIZES.body5, color: COLORS.textLight, fontFamily: "semibold" }}>{post.author.name}</Text>
             </View>
             

@@ -7,7 +7,6 @@ import Post from '@/components/Post'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { PostType } from '@/types/PostType'
 import { usePosts } from '@/hooks/usePosts'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import NoPost from '@/components/NoPost'
 
 const Home = () => {
@@ -28,6 +27,8 @@ const Home = () => {
     setIsRefreshing(false);
   }
   
+  console.log('Posts on Home:', posts[0]?.author.profile.userImageUrl)
+
   // Handle loading state
   if (isLoading) {
     // console.log('Loading posts...', posts)
