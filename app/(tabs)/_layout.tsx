@@ -1,21 +1,33 @@
 import React, { useContext, useEffect } from 'react'
 import { Tabs, useRouter } from 'expo-router'
 import { Entypo, MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import { Image } from 'react-native';
 import { COLORS } from '@/constants/colors';
 import { BlurView } from 'expo-blur';
 import { AuthContext } from '@/context/AuthContext';
+import { useGetUser } from '@/hooks/useGetUser';
+import { SvgUri } from 'react-native-svg';
+import { View } from 'react-native';
 
 const TabsLayout = () => {
   const { userToken } = useContext(AuthContext)
   const router = useRouter();
+
+  const { useUser } = useGetUser();
+
+  const { data, isFetching, isLoading, isError, error } = useUser();
   
   useEffect(() => {
     if (!userToken) {
       // Redirect to the login page if the user is not authenticated
       router.replace('/(auth)/login');
     }
-  }, [userToken]);
+  }, [userToken, router]);
+  
+  // Handle error state
+  if (isError) {
+    console.log('Error fetching user', error)
+    // return ( <Text>Error loading posts...</Text> )
+  }
   
   
   return (
@@ -72,24 +84,30 @@ const TabsLayout = () => {
           tabBarIcon: ({ color, size }) => <MaterialIcons name="notifications" size={size} color={color} />,
           tabBarBadge: 3,
         }} />
-      <Tabs.Screen
-        name='profile'
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require('../../assets/images/appImages/profilepic.png')}        // active icon
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 12,
-                borderWidth: focused ? 2 : 0,
-                borderColor: focused ? '#019874' : 'transparent',
-              }}
-              />
+      {
+        isFetching || isLoading ? null : data &&
+        <Tabs.Screen
+          name='profile'
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ focused }) => (
+              <View 
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    borderWidth: focused ? 2 : 0,
+                    borderColor: focused ? '#019874' : 'transparent',
+                    backgroundColor: COLORS.border,
+                  }}>
+                <SvgUri
+                    uri={data?.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + data?.name}
+                  />
+              </View>
             )
-        }}
+          }}
         />
+      }
     </Tabs>
   )
 }

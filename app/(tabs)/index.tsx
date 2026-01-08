@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { COLORS } from '@/constants/colors'
 import Header from '@/components/Header'
 import Featured from '@/components/Featured'
@@ -13,7 +13,7 @@ const Home = () => {
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const { useGetPosts, invalidatePosts } = usePosts(); 
 
-  const { data: posts, isLoading, isError, error } = useGetPosts()
+  const { data: posts, isFetching, isLoading, isError, error } = useGetPosts();
     
   const tabBarHeight = useBottomTabBarHeight()
 
@@ -26,18 +26,9 @@ const Home = () => {
     
     setIsRefreshing(false);
   }
-  
-  console.log('Posts on Home:', posts[0]?.author.profile.userImageUrl)
 
-  // Handle loading state
-  if (isLoading) {
-    // console.log('Loading posts...', posts)
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
-        <ActivityIndicator size="large" />
-      </View>
-    )
-  }
+  // refresh when component mounts
+    
 
   // Handle error state
   if (isError) {
@@ -48,39 +39,43 @@ const Home = () => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <Header title="Home" icon={true} identification={false} />
-      
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 15,
-          paddingTop: 30,
-          paddingBottom: tabBarHeight
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
-            colors={[COLORS.primary]}
-          />
-        }
-      >
-        <View style={{ gap: 20 }}>
-          <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text }}>
-            Top Post
-          </Text>
-          <Featured />
-
-          {!posts || posts.length === 0
-            ? <NoPost /> :
-            <View style={{ gap: 10, marginTop: 10, marginBottom: 30 }}>
-              <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text }}>Recent</Text>
-              {posts && posts.map((post: PostType) => (
-                <Post key={post.id} post={post}/>
-              ) ) }
-            </View>
+      {isLoading || isFetching ?
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
+          <ActivityIndicator size="large" color={COLORS.primary}/>
+        </View> :
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 15,
+            paddingTop: 30,
+            paddingBottom: tabBarHeight
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+              colors={[COLORS.primary]}
+            />
           }
-        </View>
-      </ScrollView>
+        >
+          <View style={{ gap: 20 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text }}>
+              Top Post
+            </Text>
+            <Featured />
+
+            {!posts || posts.length === 0
+              ? <NoPost /> :
+              <View style={{ gap: 10, marginTop: 10, marginBottom: 30 }}>
+                <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text }}>Recent</Text>
+                {posts && posts.map((post: PostType) => (
+                  <Post key={post.id} post={post}/>
+                ) ) }
+              </View>
+            }
+          </View>
+        </ScrollView>
+      }
     </View>
   )
 }

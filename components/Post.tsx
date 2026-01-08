@@ -57,7 +57,7 @@ const Post = ({ post }: { post: PostType }) => {
                   /> */}
                   <View style={{ width: 20, height: 20, borderRadius: 20, overflow: 'hidden', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, justifyContent: 'center', alignItems: 'center' }}>
                     <SvgUri
-                        style={{ width: 20, height: 20, borderRadius: 20 }}
+                        style={{ width: 20, height: 20 }}
                         uri={post?.author.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + post.author.name}
                       />
                     </View>

@@ -8,10 +8,8 @@ const debuggerHost = Constants.expoConfig?.hostUri?.split(':').shift();
 // Set the API URL based on the platform
 const API_URL = Platform.OS === 'android' ? `http://${debuggerHost}:3000` : 'http://localhost:3000';
 
-console.log("Connecting to:", API_URL);
-
 export const apiClient = async (endpoint, options = {}) => {
-  const token = Platform.OS === await AsyncStorage.getItem('userToken');
+  const token = await AsyncStorage.getItem('userToken');
 
   // default headers
   const headers = {
@@ -19,7 +17,9 @@ export const apiClient = async (endpoint, options = {}) => {
     ...options.headers,
   };
 
-  // If token exists, add the Bearer prefix for your authMiddleware
+  if (!token) return;
+
+  // If token exists, add it to headers as Authorization
   if (token) {
     headers['Authorization'] = `${token}`;
   }
