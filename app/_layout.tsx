@@ -4,7 +4,6 @@ import { SplashScreen, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import * as Font from 'expo-font';
 import { AuthProvider } from "@/context/AuthContext";
-import { AppProvider } from "@/context/AppContext";
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -55,13 +54,11 @@ export default function RootLayout() {
   }
   return (
     <QueryClientProvider client={queryClient}>
-      <AppProvider>
         <AuthProvider>
             <SafeScreen>
               <Stack screenOptions={{ headerShown: false  }}/>
             </SafeScreen>
         </AuthProvider>
-      </AppProvider>
     </QueryClientProvider>
   )
 }

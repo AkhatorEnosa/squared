@@ -1,11 +1,14 @@
 import React, { createContext, useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from "expo-router";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [userToken, setUserToken] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const router = useRouter()
 
     // Load token from storage on startup
     useEffect(() => {
@@ -16,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
                 if (token) {
                     setUserToken(token);
-                    console.log("from authcontext", token)
+                    router.replace('/(auth)/login');
                 }
             } catch (err) {
                 console.log('Failed to load token', err);

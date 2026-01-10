@@ -6,6 +6,8 @@ export interface PostType {
     createdAt: Date;
     updatedAt: Date;
     imageUrl?: string;
+    publishedAt?: Date;
+    featuredAt?: Date;
     tags?: string[];
     isPublished: boolean;
     author: {

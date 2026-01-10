@@ -15,31 +15,20 @@ interface PostResponse {
     createdAt: string;
 }
 
-
 export const useCreatePost = () => {
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient();
 
     return useMutation<PostResponse, Error, CreatePostVariables>({
         mutationFn: async ({ title, content }) => {
-            const response = await apiClient("/posts/create", {
+            return await apiClient("/posts/create", {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({ title, content }),
             });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to create post');
-            }
-
-            return response.json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['posts'],
-            })
+            });
         }
-    })
-}
+    });
+};

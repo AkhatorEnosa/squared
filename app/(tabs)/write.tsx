@@ -1,10 +1,11 @@
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useRouter } from 'expo-router';
 import Header from '@/components/Header';
 import { COLORS } from '@/constants/colors';
 import { SIZES } from '@/constants/sizes';
 import { useCreatePost } from "@/hooks/useCreatePost"
+import { AppContext } from '@/context/AppContext';
 
 
 const Write = () => {
@@ -14,7 +15,7 @@ const Write = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter()
-    const { mutate, error } = useCreatePost();
+    const { mutate, isPending, isSuccess } = useCreatePost();
 
     // Handle login logic here
     const handlePost = async () => {
@@ -27,18 +28,20 @@ const Write = () => {
             }
 
             // Call the createPost mutation
-            mutate({ title, content: post });
-            
-            if (error) console.log('Error creating post:', error);
-            
-              setMessage('Post published successfully!');
-              setTitle('');
-              setPost('');
+            mutate({ title, content: post }, {
+              onSuccess: (newPost) => {
+                  
+                  setMessage('Post published successfully!');
+                  setTitle('');
+                  setPost('');
 
-              //navigate to another screen
-              router.replace('/(tabs)');
-
-            return { success: true };
+                  // Delay navigation slightly so user sees the success message
+                      router.replace('/(tabs)');
+              },
+              onError: (err) => {
+                  setMessage(err.message || 'An error occurred. Please try again.');
+              }
+          });
         } catch (error) {
             setMessage('An error occurred. Please try again.' + error);
             return { success: false, error: 'Network error' };
@@ -157,7 +160,7 @@ const Write = () => {
                   onPress={handlePost}
                   disabled={isLoading}
               >
-                  {isLoading ? (
+                  {isLoading || isPending ? (
                       <ActivityIndicator color={COLORS.white} size={'small'} />
                   ) : (
                       <Text style={{ color: COLORS.white, fontFamily: 'medium', fontSize: SIZES.font}}>
@@ -172,8 +175,7 @@ const Write = () => {
                       style={{
                           fontSize: 12,
                           fontFamily: 'medium',
-                          color:
-                          message === 'Login successful!'
+                          color: isSuccess
                               ? COLORS.primary
                               : COLORS.error,
                           textAlign: 'center',

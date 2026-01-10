@@ -12,7 +12,7 @@ import NoPost from '@/components/NoPost'
 
 const Welcome = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { userToken, loading } = useContext(AuthContext)
+  const { userToken } = useContext(AuthContext)
   const router = useRouter()
   
   const { useGetPosts, invalidatePosts } = usePosts()
@@ -23,7 +23,7 @@ const Welcome = () => {
     if (userToken) {
       router.replace('/(tabs)')
     }
-  }, [userToken, router])
+  }, [userToken])
 
   // on Refresh 
   const onRefresh = () => {
@@ -66,13 +66,13 @@ const Welcome = () => {
               />
             }
           >
-            {!posts || posts?.length === 0 ?
+            {!posts || posts.length === 0 ?
               <NoPost /> :
               <>
                 <Text style={{ fontSize: SIZES.h4, fontFamily: "bold", }}>Hot Topics</Text>
 
                 <View style={{ flex: 1, gap: 20 }}>
-                  {posts && posts.map((post: PostType) => (
+                  {posts && posts?.map((post: PostType) => (
                     <Post key={post.id} post={post} />
                   ))}
                 </View>

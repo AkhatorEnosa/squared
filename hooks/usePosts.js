@@ -12,11 +12,9 @@ export const usePosts = () => {
             initialData: [],
             refetchOnReconnect: true,
             refetchIntervalInBackground: true,
-            refetchOnWindowFocus: true,
-            retry: 3,
+            retry: 1,
         })
     }
-    
 
     const invalidatePosts = () => {
         queryClient.invalidateQueries(["posts"]);

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl, AppStateStatus, Platform, AppState } from 'react-native'
 import React, { useEffect } from 'react'
 import { COLORS } from '@/constants/colors'
 import Header from '@/components/Header'
@@ -13,7 +13,7 @@ const Home = () => {
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const { useGetPosts, invalidatePosts } = usePosts(); 
 
-  const { data: posts, isFetching, isLoading, isError, error } = useGetPosts();
+  const { data: posts, isFetching, isLoading, isError } = useGetPosts();
     
   const tabBarHeight = useBottomTabBarHeight()
 
@@ -28,11 +28,9 @@ const Home = () => {
   }
 
   // refresh when component mounts
-    
 
   // Handle error state
   if (isError) {
-    console.log('Error fetching posts', error)
     return ( <Text>Error loading posts...</Text> )
   }
 
