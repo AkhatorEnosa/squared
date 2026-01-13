@@ -8,24 +8,6 @@ const debuggerHost = Constants.expoConfig?.hostUri?.split(':').shift();
 // Set the API URL based on the platform
 const API_URL = Platform.OS === 'android' ? `http://${debuggerHost}:3000` : 'http://localhost:3000';
 
-const isTokenExpired = async (token) => {
-  try {
-    if (!token) return true;
-    const base64Url = token.split('.')[1]; // Get payload part
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const payload = JSON.parse(window.atob(base64));
-    
-    const expired = payload.exp < (Date.now() / 1000);
-
-    if (expired) {
-      await AsyncStorage.removeItem('userToken');
-    }
-  } catch (err) {
-    console.error('Failed to decode token', err);
-    await AsyncStorage.removeItem('userToken');
-  }
-}
-
 export const apiClient = async (endpoint, options = {}) => {
   const token = await AsyncStorage.getItem('userToken');
 
@@ -36,8 +18,6 @@ export const apiClient = async (endpoint, options = {}) => {
     'Content-Type': 'application/json',
     ...options.headers,
   };
-
-  if (!token) return;
 
   // If token exists, add it to headers as Authorization
   if (token) {
@@ -61,5 +41,24 @@ export const apiClient = async (endpoint, options = {}) => {
   console.log()
   return data;
 };
+
+const isTokenExpired = async (token) => {
+  try {
+    if (!token) return
+
+    const base64Url = token.split('.')[1]; // Get payload part
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(window.atob(base64));
+    
+    const expired = payload.exp < (Date.now() / 1000);
+
+    if (expired) {
+      await AsyncStorage.removeItem('userToken');
+    }
+  } catch (err) {
+    console.error('Failed to decode token', err);
+    await AsyncStorage.removeItem('userToken');
+  }
+}
 
 export default apiClient;

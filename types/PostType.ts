@@ -5,6 +5,7 @@ export interface PostType {
     authorId: string;
     createdAt: Date;
     updatedAt: Date;
+    featured: boolean;
     imageUrl?: string;
     publishedAt?: Date;
     featuredAt?: Date;

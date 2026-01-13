@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider,  } from "@tanstack/react-query";
 import SafeScreen from "@/components/SafeScreen";
-import { SplashScreen, Stack } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { SplashScreen, Stack, useRouter } from "expo-router";
+import React, { useContext, useEffect, useState } from "react";
 import * as Font from 'expo-font';
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthContext, AuthProvider } from "@/context/AuthContext";
+
+
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -55,10 +57,26 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
         <AuthProvider>
-            <SafeScreen>
-              <Stack screenOptions={{ headerShown: false  }}/>
-            </SafeScreen>
+          <RootLayoutNav />
         </AuthProvider>
     </QueryClientProvider>
   )
+}
+
+function RootLayoutNav() {
+  const { userToken } = useContext(AuthContext); // This will now work!
+  const router = useRouter();
+
+  useEffect(() => {
+    // Logic for auth-based redirection
+    if (userToken) {
+      router.replace('/(tabs)');
+    }
+  }, [userToken, router]);
+
+  return (
+    <SafeScreen>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SafeScreen>
+  );
 }

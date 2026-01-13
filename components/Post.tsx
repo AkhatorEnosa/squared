@@ -8,6 +8,7 @@ import { SIZES } from '@/constants/sizes'
 import { Eye, Heart, MessageCircle } from 'lucide-react-native'
 import { PostType } from '@/types/PostType'
 import { SvgUri } from 'react-native-svg';
+import { TooltipWrapper } from './TooltipWrapper';
 
 const Post = ({ post }: { post: PostType }) => {
     const [liked, setLiked] = useState<boolean>(false)
@@ -22,21 +23,33 @@ const Post = ({ post }: { post: PostType }) => {
         }
 
         if (dist.includes('day') || dist.includes('days') || dist.includes('month') || dist.includes('months') || dist.includes('year') || dist.includes('years')) {
-            return moment(createdAt).format("Do MMM, YYYY hh:mm a") + ' . ' + moment(createdAt).fromNow();
+            return moment(createdAt).format("Do MMM, YYYY @ hh:mm a") + ' . ' + moment(createdAt).fromNow();
         }
 
         return dist + ' ago';
     }
   return (
-    <View style={{ paddingHorizontal: 10, paddingVertical: 16, gap: 10, boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, backgroundColor: COLORS.secondary, borderRadius: 20 }}>
+    <TouchableOpacity 
+        style={{ 
+            paddingHorizontal: 10, 
+            paddingVertical: 16,
+            gap: 10,
+            boxShadow: `0px 0.5px 4px ${COLORS.shadow}`,
+            borderWidth: 1,
+            borderColor: COLORS.border,
+            borderRadius: 20 
+        }}
+    >
         <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: 'center' }}>
-            <Link href={"/"} style={{ fontSize: SIZES.body5, textDecorationLine: 'underline', fontFamily: "bold" }}>{ post.title }</Link>
-              <Text style={{ fontSize: 10, color: COLORS.textLight, fontFamily: "regular" }}>
-                  {formatPostTime(post.createdAt)}</Text>
+            <Link href={"/"} style={{ fontSize: SIZES.h4, fontFamily: "bold", textTransform: 'capitalize' }}>{ post.title }</Link>
+            
+            <TooltipWrapper text={post && formatPostTime(post.createdAt).split(".")[0]}>
+                <Text style={{ fontSize: 12, color: COLORS.textLight }}>{ post && (formatPostTime(post.createdAt).includes('just now') || formatPostTime(post.createdAt).includes('minutes') || formatPostTime(post.createdAt).includes('hour')) ? formatPostTime(post.createdAt) : formatPostTime(post.createdAt).split(".")[1] }</Text>  
+            </TooltipWrapper>
         </View>
           
         <View style={{ width: '100%', flex: 1, gap: 10, overflow: 'hidden' }}>
-            <Text style={{width: '100%', fontSize: SIZES.body5, color: COLORS.text, fontFamily: "regular" }}>
+            <Text style={{width: '100%', fontSize: SIZES.body4, color: COLORS.text, fontFamily: "regular" }}>
                 {post.content}
             </Text>
             {post.imageUrl && 
@@ -51,10 +64,6 @@ const Post = ({ post }: { post: PostType }) => {
         
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', gap: 8.66, alignItems: 'center' }}>
-                {/* <Image 
-                    source={{ uri: 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + post.author.name }}
-                    style={{ width: 20, height: 20, borderRadius: 20, resizeMode: 'cover' }}
-                  /> */}
                   <View style={{ width: 20, height: 20, borderRadius: 20, overflow: 'hidden', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, justifyContent: 'center', alignItems: 'center' }}>
                     <SvgUri
                         style={{ width: 20, height: 20 }}
@@ -83,7 +92,7 @@ const Post = ({ post }: { post: PostType }) => {
                 </View>
             </View>
         </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 

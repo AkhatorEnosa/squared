@@ -1,71 +1,115 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'
-import React, { useContext } from 'react'
+import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native'
+import React, { useContext, useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
+import { SIZES } from '@/constants/sizes';
+import { Eye, Heart, MessageCircle } from 'lucide-react-native';
+import { PostType } from '@/types/PostType';
+import moment from 'moment';
+import { formatDistanceToNow } from 'date-fns';
+import { TooltipWrapper } from './TooltipWrapper';
 
-const Featured = () => {
+// Get screen width dynamically
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+console.log(SCREEN_WIDTH)
+// Adjust for the 15px horizontal padding in your Home.tsx parent container
+const CARD_WIDTH = SCREEN_WIDTH - 30; 
+
+interface FeaturedProps {
+    post?: PostType; 
+}
+
+const Featured = ({ post }: FeaturedProps) => {
+    const [liked, setLiked] = useState(false)
     const router = useRouter();
     const { logout } = useContext(AuthContext);
 
+        
+    function formatPostTime(createdAt: Date) {
+        const dist = formatDistanceToNow(new Date(createdAt), {
+            addSuffix: false,
+        });
+
+        if (dist.includes('less')) {
+            return 'just now';
+        }
+
+        if (dist.includes('day') || dist.includes('days') || dist.includes('month') || dist.includes('months') || dist.includes('year') || dist.includes('years')) {
+            return moment(createdAt).format("Do MMM, YYYY @ hh:mm a") + ' . ' + moment(createdAt).fromNow();
+        }
+
+        return dist + ' ago';
+    }
+
     const logoutUser = () => {
         logout();
-        console.log('User logged out, token removed.');
-         router.replace('/');
+        router.replace('/');
     };
-  return (
-    <TouchableOpacity style={{ backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center', boxShadow: `0px 0.5px 4px ${COLORS.shadow}`, borderRadius: 20, padding: 12, gap: 20 }} onPress={() => logoutUser()}>
-        <View style={{ width: '100%', height: 290, borderRadius: 20, overflow: 'hidden' }}>
-            <Image
-                source={require('../assets/images/appImages/featured.png')} 
-                style={{ width: '100%', resizeMode: 'cover' }}
-            />
-            <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: COLORS.featuredBg, paddingHorizontal: 4, borderRadius: 40 }}>
-                <Text style={{ fontSize: 12, fontWeight: 'semibold', color: COLORS.textLight }}>
-                    Peter Tosh
+
+    return (
+        <TouchableOpacity 
+            style={{ 
+                backgroundColor: COLORS.gray, 
+                borderWidth: 1,
+                borderColor: COLORS.border,
+                width: CARD_WIDTH, // Forces max width minus parent padding
+                borderRadius: 20, 
+                padding: 12, 
+                gap: 15,
+                // Using shadow props (boxShadow is for Web/latest RN versions only)
+                shadowColor: COLORS.shadow,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 3, // For Android support
+                marginBottom: 10
+            }} 
+            onPress={logoutUser}
+        >
+            <View style={{ width: '100%', height: 250, borderRadius: 15, overflow: 'hidden' }}>
+                <Image
+                    source={post?.imageUrl ? {uri: post?.imageUrl} : require('../assets/images/appImages/featured.png')} 
+                    style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+                />
+                <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 40 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: COLORS.white }}>
+                        {post?.author.name || 'Anonymous'}
+                    </Text>
+                </View>
+            </View>
+            
+            <View style={{ width: '100%', gap: 6 }}>
+                <Text numberOfLines={2} style={{ fontSize: SIZES.h2, fontWeight: '600', color: COLORS.text, textTransform: 'capitalize' }}>
+                    {post?.title || "The manifestation of the heart's deepest desires."}
+                </Text>
+                <Text numberOfLines={2} style={{ fontSize: SIZES.body3, color: COLORS.textLight, fontFamily: "regular" }}>
+                    {post?.content || "This is a brief description of the featured post."}
                 </Text>
             </View>
-        </View>
-        
-        {/* title and description */}
-        <View style={{ width: '100%', gap: 8 }}>
-            <Text style={{ fontSize: 14, fontWeight: 'semibold', color: COLORS.text }}>
-                The manifestation of the heart&apos;s deepest desires.
-            </Text>
-            <Text style={{ fontSize: 12, color: COLORS.text }}>
-                This is a brief description of the featured post to give users an idea of the content.
-            </Text>
-        </View>
-        
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Image 
-                        source={require('../assets/icons/comment.png')}
-                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
-                    />
-                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
+            
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
+                        <MessageCircle size={18} color={COLORS.textLight}/>
+                        <Text style={{ fontSize: 13, color: COLORS.textLight }}>300</Text>
+                    </View>
+                    <TouchableOpacity style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }} onPress={() => setLiked(!liked)}>
+                        <Heart size={18} fill={liked ? COLORS.accent : 'transparent'} stroke={liked ? COLORS.accent : COLORS.textLight} />
+                        <Text style={{ fontSize: 13, color: liked ? COLORS.accent : COLORS.textLight }}>800</Text>
+                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
+                        <Eye size={18} color={COLORS.textLight} />
+                        <Text style={{ fontSize: 13, color: COLORS.textLight }}>1.1k</Text>
+                    </View>
                 </View>
-                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Image 
-                        source={require('../assets/icons/heart-liked.png')}
-                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
-                    />
-                    <Text style={{ fontSize: 8, color: COLORS.accent, fontWeight: 'medium' }}>800</Text>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Image 
-                        source={require('../assets/icons/eye.png')}
-                        style={{ width: 13, height: 13, resizeMode: 'contain' }}
-                    />
-                    <Text style={{ fontSize: 8, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
-                </View>
-            </View>
 
-            <Text style={{ fontSize: 10, fontWeight: "semibold", color: COLORS.textLight }}>40 mins ago</Text>  
-        </View>
-    </TouchableOpacity>
-  )
+                <TooltipWrapper text={post && formatPostTime(post.createdAt).split(".")[0]}>
+                    <Text style={{ fontSize: 12, color: COLORS.textLight }}>{ post && (formatPostTime(post.createdAt).includes('just now') || formatPostTime(post.createdAt).includes('minutes') || formatPostTime(post.createdAt).includes('hour') ? formatPostTime(post.createdAt) : formatPostTime(post.createdAt).split(".")[1]) }</Text>  
+                </TooltipWrapper>
+            </View>
+        </TouchableOpacity>
+    )
 }
 
-export default Featured
+export default Featured;

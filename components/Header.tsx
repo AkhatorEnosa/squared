@@ -50,7 +50,7 @@ const Header = ({ title, icon, identification }: { title?: string, icon?: boolea
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: `${COLORS.white}`,
+    backgroundColor: `${COLORS.gray}`,
     paddingTop: 30,
     paddingBottom: 10,
     paddingHorizontal: 15,
