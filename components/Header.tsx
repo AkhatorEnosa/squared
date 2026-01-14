@@ -14,7 +14,7 @@ const Header = ({ title, icon, identification }: { title?: string, icon?: boolea
     // Use SafeAreaView to handle the notch and status bar area
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <Link href="/(tabs)">
+        <Link href="/">
             <Image 
                 source={require('../assets/images/appImages/logo.png')} 
                 style={{ width: 40, height: 40, resizeMode: 'contain' }}

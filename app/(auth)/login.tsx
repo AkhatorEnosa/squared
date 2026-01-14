@@ -19,8 +19,6 @@ const Login = () => {
 
     const { login } = useContext(AuthContext)
 
-
-
     // This grabs the IP address Expo is using to bundle the app
     const debuggerHost = Constants.expoConfig?.hostUri?.split(':').shift();
 

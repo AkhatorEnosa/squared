@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl, AppStateStatus, Platform, AppState, FlatList, Dimensions } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, ActivityIndicator, RefreshControl, FlatList, Dimensions } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import Header from '@/components/Header'
 import Featured from '@/components/Featured'
@@ -8,13 +8,21 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { PostType } from '@/types/PostType'
 import { usePosts } from '@/hooks/usePosts'
 import NoPost from '@/components/NoPost'
+import { AuthContext } from '@/context/AuthContext'
+import { useGetUser } from '@/hooks/useGetUser'
 
 const Home = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [featuredPosts, setFeaturedPosts] = useState<PostType[]>([])
   const { useGetPosts, invalidatePosts } = usePosts(); 
 
-  const { data: posts, isFetching, isLoading, isError } = useGetPosts();
+  // get user info
+  const { useUser } = useGetUser();
+  const { data:user } = useUser();
+
+  const { data: posts, isLoading, isError } = useGetPosts();
+
+  const { userToken } = useContext(AuthContext)
     
   const tabBarHeight = useBottomTabBarHeight()
 
@@ -45,8 +53,8 @@ const Home = () => {
   }
 
   const renderHeader = () => (
-    <View style={{ gap: 20, marginBottom: 20 }}>
-      <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text }}>
+    <View style={{ marginBottom: 20 }}>
+      <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text, marginBottom: 20 }}>
         Top Post
       </Text>
 
@@ -56,16 +64,20 @@ const Home = () => {
         data={featuredPosts}
         keyExtractor={(item) => `featured-${item.id}`}
         renderItem={({ item }) => (
-          <Featured post={item} />
+          <View style={{ alignItems: 'flex-start' }}>
+            <Featured post={item} />
+          </View>
         )}
         showsHorizontalScrollIndicator={false}
-        // This makes the cards "snap" to the center/start
-        snapToInterval={SCREEN_WIDTH - 30 + 15} // Card Width + Gap
+        snapToInterval={SCREEN_WIDTH - 30 + 15}
         decelerationRate="fast"
-        contentContainerStyle={{ gap: 15 }} // Spacing between featured cards
+        contentContainerStyle={{
+            gap: 15,
+            alignItems: 'flex-start'
+        }}
       />
 
-      <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text, marginTop: 10 }}>
+      <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text, marginTop: 30 }}>
         Recent
       </Text>
     </View>
@@ -75,7 +87,7 @@ const Home = () => {
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <Header title="Home" icon={true} identification={false} />
 
-      {isLoading || isFetching ? (
+      {isLoading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -83,9 +95,13 @@ const Home = () => {
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <Post post={item} />}
+            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={ user.id } />}
           ListHeaderComponent={renderHeader} // Renders Featured Posts
           ListEmptyComponent={<NoPost />} // Handles empty state
+          maintainVisibleContentPosition={{
+            autoscrollToTopThreshold: 0,
+            minIndexForVisible: 0,
+          }}
           contentContainerStyle={{
             gap: 10,
             paddingHorizontal: 15,

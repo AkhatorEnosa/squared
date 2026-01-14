@@ -56,22 +56,21 @@ const Featured = ({ post }: FeaturedProps) => {
                 width: CARD_WIDTH, // Forces max width minus parent padding
                 borderRadius: 20, 
                 padding: 12, 
-                gap: 15,
+                gap: post?.imageUrl && 15,
                 // Using shadow props (boxShadow is for Web/latest RN versions only)
                 shadowColor: COLORS.shadow,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
                 shadowRadius: 4,
                 elevation: 3, // For Android support
-                marginBottom: 10
             }} 
             onPress={logoutUser}
         >
-            <View style={{ width: '100%', height: 250, borderRadius: 15, overflow: 'hidden' }}>
-                <Image
-                    source={post?.imageUrl ? {uri: post?.imageUrl} : require('../assets/images/appImages/featured.png')} 
+            <View style={{ width: '100%', height: post?.imageUrl ? 250 : 'auto', borderRadius: 15, overflow: post?.imageUrl ? 'hidden' : 'visible' }}>
+                {post?.imageUrl && <Image
+                    source={post?.imageUrl ? { uri: post?.imageUrl } : require('../assets/images/appImages/featured.png')}
                     style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
-                />
+                />}
                 <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 40 }}>
                     <Text style={{ fontSize: 12, fontWeight: '600', color: COLORS.white }}>
                         {post?.author.name || 'Anonymous'}
@@ -88,7 +87,7 @@ const Featured = ({ post }: FeaturedProps) => {
                 </Text>
             </View>
             
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: !post?.imageUrl ? 15 : 'auto' }}>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
                         <MessageCircle size={18} color={COLORS.textLight}/>

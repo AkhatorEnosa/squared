@@ -5,8 +5,6 @@ import Header from '@/components/Header';
 import { COLORS } from '@/constants/colors';
 import { SIZES } from '@/constants/sizes';
 import { useCreatePost } from "@/hooks/useCreatePost"
-import { AppContext } from '@/context/AppContext';
-
 
 const Write = () => {
     const [title, setTitle] = useState('');

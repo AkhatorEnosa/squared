@@ -37,8 +37,6 @@ export const apiClient = async (endpoint, options = {}) => {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || 'Network response was not ok');
   }
-    
-  console.log()
   return data;
 };
 

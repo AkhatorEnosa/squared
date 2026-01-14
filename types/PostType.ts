@@ -2,7 +2,6 @@ export interface PostType {
     id: string;
     title: string;
     content: string;
-    authorId: string;
     createdAt: Date;
     updatedAt: Date;
     featured: boolean;
@@ -17,5 +16,12 @@ export interface PostType {
         profile?: {
             userImageUrl?: string;
         };
+    };
+    reactions: {
+        type: string;
+        userId: string;
+    };
+    _count: {
+        reactions: number;
     };
 }

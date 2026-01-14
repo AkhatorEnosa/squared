@@ -1,17 +1,23 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import moment from 'moment';
 import { formatDistanceToNow } from "date-fns";
 import { COLORS } from '@/constants/colors'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import { SIZES } from '@/constants/sizes'
-import { Eye, Heart, MessageCircle } from 'lucide-react-native'
+import { Eye, Heart, Trash, X } from 'lucide-react-native'
 import { PostType } from '@/types/PostType'
 import { SvgUri } from 'react-native-svg';
 import { TooltipWrapper } from './TooltipWrapper';
+import useDeletePost from '@/hooks/useDeletePost';
+import useAddReaction from '@/hooks/useAddReaction';
 
-const Post = ({ post }: { post: PostType }) => {
+const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean, userId: string }) => {
     const [liked, setLiked] = useState<boolean>(false)
+    const { mutate: reactToPost } = useAddReaction();
+    const { mutate: deletePost, isPending } = useDeletePost();
+
+    const router = useRouter()
     
     function formatPostTime(createdAt: Date) {
         const dist = formatDistanceToNow(new Date(createdAt), {
@@ -28,6 +34,25 @@ const Post = ({ post }: { post: PostType }) => {
 
         return dist + ' ago';
     }
+
+    const handleReactions = () => {
+        if (!userToken) {
+            // relocate if not logged in
+            router.replace('/(auth)/login')
+            return
+        }
+        setLiked(!liked);
+        reactToPost({ postId: post.id, type: liked ? 'LIKE' : 'LIKE' });
+    }
+
+    const handleDelete = (postId: string | number) => {
+        deletePost(postId, {
+            onSuccess: () => {
+                console.log('Post deleted succesfully')
+            },
+        })
+    }
+
   return (
     <TouchableOpacity 
         style={{ 
@@ -62,36 +87,40 @@ const Post = ({ post }: { post: PostType }) => {
             }
         </View>
         
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', gap: 8.66, alignItems: 'center' }}>
-                  <View style={{ width: 20, height: 20, borderRadius: 20, overflow: 'hidden', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, justifyContent: 'center', alignItems: 'center' }}>
-                    <SvgUri
-                        style={{ width: 20, height: 20 }}
-                        uri={post?.author.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + post.author.name}
-                      />
-                    </View>
-                  <Text style={{ fontSize: SIZES.body5, color: COLORS.textLight, fontFamily: "semibold" }}>{post.author.name}</Text>
-            </View>
-            
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-                <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', gap: 10, borderWidth:1, borderColor: COLORS.border, borderRadius: 10, paddingHorizontal: 5 }}>
+                {/* <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
                     <MessageCircle size={SIZES.font}/>
                     <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
-                </View>
-                <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => setLiked(!liked)}>
+                </View> */}
+                <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
                     {
                         liked ?  
                             <Heart size={SIZES.font} fill={COLORS.accent} stroke={COLORS.accent} /> :
                             <Heart size={SIZES.font} /> 
                     }
-                      <Text style={{ fontSize: SIZES.font, color: liked ? COLORS.accent : COLORS.textLight , fontWeight: 'medium' }}>800</Text>
+                      <Text style={{ fontSize: SIZES.font, color: liked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ post._count.reactions }</Text>
                 </TouchableOpacity>
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
                     <Eye size={SIZES.font} />
                     <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
                 </View>
+                {userId === post.author.id && <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleDelete(post?.id)}>
+                      {isPending ? <ActivityIndicator color={COLORS.shadow} size={'small'} /> : <Trash size={SIZES.font} fill={COLORS.shadow} />}
+                </TouchableOpacity>}
+            </View>
+            
+            <View style={{ flexDirection: 'row', gap: 8.66, alignItems: 'center' }}>
+                <View style={{ width: 20, height: 20, borderRadius: 20, overflow: 'hidden', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border, justifyContent: 'center', alignItems: 'center' }}>
+                    <SvgUri
+                        style={{ width: 20, height: 20 }}
+                        uri={post?.author.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + post.author.name}
+                    />
+                </View>
+                <Text style={{ fontSize: SIZES.body5, color: COLORS.textLight, fontFamily: "semibold" }}>{post.author.name}</Text>
             </View>
         </View>
+            
     </TouchableOpacity>
   )
 }
