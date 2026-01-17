@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { COLORS } from '@/constants/colors'
 import { Link, useRouter } from 'expo-router'
 import { SIZES } from '@/constants/sizes'
-import { Eye, Heart, Trash, X } from 'lucide-react-native'
+import { CheckIcon, Eye, Heart, Trash, X } from 'lucide-react-native'
 import { PostType } from '@/types/PostType'
 import { SvgUri } from 'react-native-svg';
 import { TooltipWrapper } from './TooltipWrapper';
@@ -14,6 +14,8 @@ import useAddReaction from '@/hooks/useAddReaction';
 
 const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean, userId: string }) => {
     const [liked, setLiked] = useState<boolean>(false)
+    const [ confirmDelete, setConfirmDelete ] = useState<boolean>(false)
+
     const { mutate: reactToPost } = useAddReaction();
     const { mutate: deletePost, isPending } = useDeletePost();
 
@@ -41,7 +43,9 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
             router.replace('/(auth)/login')
             return
         }
-        setLiked(!liked);
+
+        // check likes and set accordingly if post
+
         reactToPost({ postId: post.id, type: liked ? 'LIKE' : 'LIKE' });
     }
 
@@ -99,15 +103,22 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
                             <Heart size={SIZES.font} fill={COLORS.accent} stroke={COLORS.accent} /> :
                             <Heart size={SIZES.font} /> 
                     }
-                      <Text style={{ fontSize: SIZES.font, color: liked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ post._count.reactions }</Text>
+                    <Text style={{ fontSize: SIZES.font, color: liked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ post._count.reactions }</Text>
                 </TouchableOpacity>
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
                     <Eye size={SIZES.font} />
                     <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
                 </View>
-                {userId === post.author.id && <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleDelete(post?.id)}>
-                      {isPending ? <ActivityIndicator color={COLORS.shadow} size={'small'} /> : <Trash size={SIZES.font} fill={COLORS.shadow} />}
-                </TouchableOpacity>}
+                {
+                    userId === post.author.id && 
+                    <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => confirmDelete ? handleDelete(post?.id) : setConfirmDelete(!confirmDelete)}>
+                        <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' , display: confirmDelete ? 'flex' : 'none' }}>
+                            <X size={SIZES.font} fill={COLORS.shadow} onPress={() => setConfirmDelete(!confirmDelete)} />
+                            {isPending ? <ActivityIndicator color={COLORS.shadow} /> : <CheckIcon size={SIZES.font} stroke={COLORS.accent} />}
+                        </View>
+                        <Trash size={SIZES.font} fill={COLORS.shadow} style={{ display: confirmDelete ? 'none' : 'flex' }} />
+                    </TouchableOpacity>
+                }
             </View>
             
             <View style={{ flexDirection: 'row', gap: 8.66, alignItems: 'center' }}>

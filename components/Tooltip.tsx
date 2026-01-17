@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
-import { COLORS } from '@/constants/colors';
 import { SIZES } from '@/constants/sizes';
 
 interface TooltipProps {

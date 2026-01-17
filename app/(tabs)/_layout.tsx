@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Tabs, useRouter } from 'expo-router'
 import { Entypo, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -7,14 +7,17 @@ import { AuthContext } from '@/context/AuthContext';
 import { useGetUser } from '@/hooks/useGetUser';
 import { SvgUri } from 'react-native-svg';
 import { View } from 'react-native';
+import { ProfileModal } from '@/components/ProfileModal';
 
 const TabsLayout = () => {
-  const { userToken } = useContext(AuthContext)
+  const [profileModalVisible, setProfileModalVisible] = useState<boolean>(false);
+
+  const { userToken, logout } = useContext(AuthContext)
   const router = useRouter();
 
   const { useUser } = useGetUser();
 
-  const { data, isFetching, isLoading, isError, error } = useUser();
+  const { data: user, isFetching, isLoading, isError, error } = useUser();
   
   useEffect(() => {
     if (!userToken) {
@@ -31,6 +34,7 @@ const TabsLayout = () => {
   
   
   return (
+    <>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -85,11 +89,11 @@ const TabsLayout = () => {
           tabBarBadge: 3,
         }} />
       {
-        isFetching || isLoading ? null : data &&
+        isFetching || isLoading ? null : user &&
         <Tabs.Screen
           name='profile'
           options={{
-            title: "Profile",
+            title: user?.name ? user?.name.split(' ')[0] : 'profile',
             tabBarIcon: ({ focused }) => (
               <View 
                   style={{
@@ -101,14 +105,30 @@ const TabsLayout = () => {
                     backgroundColor: COLORS.border,
                   }}>
                 <SvgUri
-                    uri={data?.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + data?.name}
+                    uri={user?.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + user?.name}
                   />
               </View>
             )
           }}
+          listeners={{
+            tabPress: (e) => {
+              // Prevent default navigation
+              e.preventDefault();
+              setProfileModalVisible(true); 
+            },
+          }}
         />
       }
     </Tabs>
+
+    {/* profile modal  */}
+    <ProfileModal 
+        visible={profileModalVisible} 
+        onClose={() => setProfileModalVisible(false)} 
+        onLogout={logout}
+        user={user}
+      />
+    </>
   )
 }
 

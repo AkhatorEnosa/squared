@@ -20,7 +20,7 @@ const Home = () => {
   const { useUser } = useGetUser();
   const { data:user } = useUser();
 
-  const { data: posts, isLoading, isError } = useGetPosts();
+  const { data: posts, isFetching, isLoading, isError } = useGetPosts();
 
   const { userToken } = useContext(AuthContext)
     
@@ -87,7 +87,7 @@ const Home = () => {
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <Header title="Home" icon={true} identification={false} />
 
-      {isLoading ? (
+      {isLoading || isFetching ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
@@ -95,7 +95,7 @@ const Home = () => {
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={ user.id } />}
+            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={ user?.id } />}
           ListHeaderComponent={renderHeader} // Renders Featured Posts
           ListEmptyComponent={<NoPost />} // Handles empty state
           maintainVisibleContentPosition={{

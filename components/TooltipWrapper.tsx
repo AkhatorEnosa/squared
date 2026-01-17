@@ -1,17 +1,17 @@
-import React, { useState, useRef } from 'react';
+// This is an overkill solution for showing tooltips on long press in React Native though.
+
+import React, { useState } from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import Tooltip from './Tooltip';
 
 export const TooltipWrapper = ({ children, text }: { children: React.ReactNode; text: string | undefined }) => {
   const [visible, setVisible] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const show = () => {
       setVisible(true);
   };
 
   const hide = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
     setVisible(false);
   };
 

@@ -12,9 +12,9 @@ import { TooltipWrapper } from './TooltipWrapper';
 
 // Get screen width dynamically
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-console.log(SCREEN_WIDTH)
+
 // Adjust for the 15px horizontal padding in your Home.tsx parent container
-const CARD_WIDTH = SCREEN_WIDTH - 30; 
+const CARD_WIDTH = SCREEN_WIDTH - 60; 
 
 interface FeaturedProps {
     post?: PostType; 
@@ -23,7 +23,6 @@ interface FeaturedProps {
 const Featured = ({ post }: FeaturedProps) => {
     const [liked, setLiked] = useState(false)
     const router = useRouter();
-    const { logout } = useContext(AuthContext);
 
         
     function formatPostTime(createdAt: Date) {
@@ -42,11 +41,6 @@ const Featured = ({ post }: FeaturedProps) => {
         return dist + ' ago';
     }
 
-    const logoutUser = () => {
-        logout();
-        router.replace('/');
-    };
-
     return (
         <TouchableOpacity 
             style={{ 
@@ -57,14 +51,8 @@ const Featured = ({ post }: FeaturedProps) => {
                 borderRadius: 20, 
                 padding: 12, 
                 gap: post?.imageUrl && 15,
-                // Using shadow props (boxShadow is for Web/latest RN versions only)
-                shadowColor: COLORS.shadow,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3, // For Android support
             }} 
-            onPress={logoutUser}
+            // onPress={logoutUser}
         >
             <View style={{ width: '100%', height: post?.imageUrl ? 250 : 'auto', borderRadius: 15, overflow: post?.imageUrl ? 'hidden' : 'visible' }}>
                 {post?.imageUrl && <Image
