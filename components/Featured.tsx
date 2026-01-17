@@ -22,7 +22,6 @@ interface FeaturedProps {
 
 const Featured = ({ post }: FeaturedProps) => {
     const [liked, setLiked] = useState(false)
-    const router = useRouter();
 
         
     function formatPostTime(createdAt: Date) {
@@ -54,7 +53,7 @@ const Featured = ({ post }: FeaturedProps) => {
             }} 
             // onPress={logoutUser}
         >
-            <View style={{ width: '100%', height: post?.imageUrl ? 250 : 'auto', borderRadius: 15, overflow: post?.imageUrl ? 'hidden' : 'visible' }}>
+            <View style={{ width: '100%', height: post?.imageUrl ? 150 : 'auto', borderRadius: 15, overflow: post?.imageUrl ? 'hidden' : 'visible' }}>
                 {post?.imageUrl && <Image
                     source={post?.imageUrl ? { uri: post?.imageUrl } : require('../assets/images/appImages/featured.png')}
                     style={{ width: '100%', height: '100%', resizeMode: 'cover' }}

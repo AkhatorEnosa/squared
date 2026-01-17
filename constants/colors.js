@@ -11,6 +11,6 @@ export const COLORS = {
   gray: "#fafcfa",
   featuredBg: "rgba(255, 255, 255, 0.8)",
   accent: "#FF4366",
-  accentBg: "rgba(255, 67, 102, 0.15)",
+  accentBg: "rgba(255, 0, 47, 0.15)",
   inputPlaceholder: "rgba(1, 152, 116, 0.6)",
 };

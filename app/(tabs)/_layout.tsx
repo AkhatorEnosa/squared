@@ -94,17 +94,20 @@ const TabsLayout = () => {
           name='profile'
           options={{
             title: user?.name ? user?.name.split(' ')[0] : 'profile',
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({ focused, color, size }) => (
+              !user || isFetching || isLoading ? 
+                <FontAwesome name="user-circle"  size={size} color={color} />
+                   :
               <View 
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    borderWidth: focused ? 2 : 0,
-                    borderColor: focused ? '#019874' : 'transparent',
-                    backgroundColor: COLORS.border,
-                  }}>
-                <SvgUri
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  borderWidth: focused ? 2 : 0,
+                  borderColor: focused ? '#019874' : 'transparent',
+                  backgroundColor: COLORS.border,
+              }}>
+                  <SvgUri
                     uri={user?.profile?.userImageUrl || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + user?.name}
                   />
               </View>
