@@ -26,10 +26,10 @@ const useAddReaction = () => {
     // OPTIONAL: Optimistic Update logic
     onMutate: async (newReaction) => {
       // Cancel any outgoing refetches so they don't overwrite our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['posts'] });
+      await queryClient.cancelQueries({ queryKey: ['postReactions'] });
 
       // Snapshot the previous value
-      const previousPosts = queryClient.getQueryData(['posts']);
+      const previousPosts = queryClient.getQueryData(['postReactions']);
 
       // Optimistically update to the new value
       // (Note: This logic depends on your exact data structure from the findMany query)
@@ -39,7 +39,7 @@ const useAddReaction = () => {
     onSuccess: () => {
       // Refresh the posts list to ensure counts are synced with the DB
       queryClient.invalidateQueries({
-        queryKey: ['posts'],
+        queryKey: ['postReactions'],
       });
     },
     

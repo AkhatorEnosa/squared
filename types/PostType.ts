@@ -18,6 +18,8 @@ export interface PostType {
         };
     };
     reactions: {
+        find(arg0: (reaction: any) => boolean): unknown;
+        some(arg0: (reaction: any) => boolean): unknown;
         type: string;
         userId: string;
     };

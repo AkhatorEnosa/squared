@@ -11,17 +11,22 @@ import { SvgUri } from 'react-native-svg';
 import { TooltipWrapper } from './TooltipWrapper';
 import useDeletePost from '@/hooks/useDeletePost';
 import useAddReaction from '@/hooks/useAddReaction';
+import { useGetReactions } from '@/hooks/useGetReactions';
 
 const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean, userId: string }) => {
-    const [liked, setLiked] = useState<boolean>(false)
-    const [ confirmDelete, setConfirmDelete ] = useState<boolean>(false)
-
     const { mutate: reactToPost } = useAddReaction();
     const { mutate: deletePost, isPending } = useDeletePost();
+    const { usePostReactions, invalidateReactions } = useGetReactions();
+    const { data: reactions } = usePostReactions(post?.id);
+
+    const [ confirmDelete, setConfirmDelete ] = useState<boolean>(false)
+    const [ isLiked,  setIsLiked ] = useState<boolean>(reactions?.some((reaction: any) => reaction.userId === userId))
+    const [ optimisticLikes, setOptimisticLikes ] = useState<number>(reactions?.length || 0)
+
 
     const router = useRouter()
     
-    function formatPostTime(createdAt: Date) {
+    const formatPostTime = (createdAt: Date) => {
         const dist = formatDistanceToNow(new Date(createdAt), {
             addSuffix: false,
         });
@@ -44,9 +49,16 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
             return
         }
 
-        // check likes and set accordingly if post
-
-        reactToPost({ postId: post.id, type: liked ? 'LIKE' : 'LIKE' });
+        try {
+            setIsLiked(!isLiked);
+            setOptimisticLikes(isLiked ? optimisticLikes - 1 : optimisticLikes + 1);
+            
+            reactToPost({ postId: post.id, type: isLiked ? 'LIKE' : 'LIKE' });
+        } catch (error) {
+            setOptimisticLikes(reactions.length);
+            setIsLiked(reactions?.some((reaction: any) => reaction.userId === userId));
+        }
+        
     }
 
     const handleDelete = (postId: string | number) => {
@@ -94,29 +106,25 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', gap: 10, borderWidth:1, borderColor: COLORS.border, borderRadius: 10, paddingHorizontal: 5 }}>
                 {/* <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <MessageCircle size={SIZES.font}/>
-                    <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
+                    <MessageCircle size={SIZES.body4}/>
+                    <Text style={{ fontSize: SIZES.body4, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
                 </View> */}
                 <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
-                    {
-                        liked ?  
-                            <Heart size={SIZES.font} fill={COLORS.accent} stroke={COLORS.accent} /> :
-                            <Heart size={SIZES.font} /> 
-                    }
-                    <Text style={{ fontSize: SIZES.font, color: liked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ post._count.reactions }</Text>
+                    <Heart size={SIZES.body4} fill={isLiked ? COLORS.accent : "transparent"} stroke={isLiked ? COLORS.accent : COLORS.text} />
+                    <Text style={{ fontSize: SIZES.body4, color: isLiked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ optimisticLikes }</Text>
                 </TouchableOpacity>
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
-                    <Eye size={SIZES.font} />
-                    <Text style={{ fontSize: SIZES.font, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
+                    <Eye size={SIZES.body4} />
+                    <Text style={{ fontSize: SIZES.body4, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
                 </View>
                 {
                     userId === post.author.id && 
                     <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => confirmDelete ? handleDelete(post?.id) : setConfirmDelete(!confirmDelete)}>
                         <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' , display: confirmDelete ? 'flex' : 'none' }}>
-                            <X size={SIZES.font} fill={COLORS.shadow} onPress={() => setConfirmDelete(!confirmDelete)} />
-                            {isPending ? <ActivityIndicator color={COLORS.shadow} /> : <CheckIcon size={SIZES.font} stroke={COLORS.accent} />}
+                            <X size={SIZES.body4} fill={COLORS.shadow} onPress={() => setConfirmDelete(!confirmDelete)} />
+                            {isPending ? <ActivityIndicator color={COLORS.shadow} /> : <CheckIcon size={SIZES.body4} stroke={COLORS.accent} />}
                         </View>
-                        <Trash size={SIZES.font} fill={COLORS.shadow} style={{ display: confirmDelete ? 'none' : 'flex' }} />
+                        <Trash size={SIZES.body4} fill={COLORS.shadow} style={{ display: confirmDelete ? 'none' : 'flex' }} />
                     </TouchableOpacity>
                 }
             </View>

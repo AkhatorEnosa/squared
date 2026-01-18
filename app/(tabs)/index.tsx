@@ -28,6 +28,17 @@ const Home = () => {
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+  // verify Liked posts
+  const verifyLike = (postId: string | number) => {
+    if (!user || !posts) return false;
+
+    const post = posts.find((p: PostType) => p.id === postId);
+    if (!post || !post.reactions) return false;
+
+    // Check if the user has liked the post
+    return post.reactions.some((reaction: any) => reaction.userId === user.id);
+  }
+
 
   useEffect(() => {
     if (posts) {
@@ -95,7 +106,7 @@ const Home = () => {
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={ user?.id } />}
+            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={user?.id} />}
           ListHeaderComponent={renderHeader} // Renders Featured Posts
           ListEmptyComponent={<NoPost />} // Handles empty state
           maintainVisibleContentPosition={{
