@@ -13,14 +13,14 @@ import useDeletePost from '@/hooks/useDeletePost';
 import useAddReaction from '@/hooks/useAddReaction';
 import { useGetReactions } from '@/hooks/useGetReactions';
 
-const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean, userId: string }) => {
+const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean, userId: string | null }) => {
     const { mutate: reactToPost } = useAddReaction();
     const { mutate: deletePost, isPending } = useDeletePost();
-    const { usePostReactions, invalidateReactions } = useGetReactions();
+    const { usePostReactions } = useGetReactions();
     const { data: reactions } = usePostReactions(post?.id);
 
     const [ confirmDelete, setConfirmDelete ] = useState<boolean>(false)
-    const [ isLiked,  setIsLiked ] = useState<boolean>(reactions?.some((reaction: any) => reaction.userId === userId))
+    const [ isLiked,  setIsLiked ] = useState<boolean>(userId ? reactions?.some((reaction: any) => reaction.userId === userId) : false)
     const [ optimisticLikes, setOptimisticLikes ] = useState<number>(reactions?.length || 0)
 
 
@@ -57,6 +57,7 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
         } catch (error) {
             setOptimisticLikes(reactions.length);
             setIsLiked(reactions?.some((reaction: any) => reaction.userId === userId));
+            console.log(error)
         }
         
     }
@@ -111,7 +112,7 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
                 </View> */}
                 <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
                     <Heart size={SIZES.body4} fill={isLiked ? COLORS.accent : "transparent"} stroke={isLiked ? COLORS.accent : COLORS.text} />
-                    <Text style={{ fontSize: SIZES.body4, color: isLiked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ optimisticLikes }</Text>
+                    <Text style={{ fontSize: SIZES.body4, color: isLiked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ userId ? optimisticLikes : reactions?.length }</Text>
                 </TouchableOpacity>
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
                     <Eye size={SIZES.body4} />

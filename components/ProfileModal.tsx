@@ -42,12 +42,12 @@ export const ProfileModal = ({ visible, onClose, onLogout, user }: ProfileModalP
                 {
                     confirmDelete ? 
                     <View style={[styles.menuItem, { flexDirection: 'row', gap: 10, alignItems: 'center' , padding: 5, display: confirmDelete ? 'flex' : 'none' }]}>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.text, borderWidth: 1, padding: 5, borderRadius: 50, paddingHorizontal: 40 }} onPress={() => setConfirmDelete(!confirmDelete)}>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.text, borderWidth: 1, borderRadius: 50, paddingVertical: 10, paddingHorizontal: 40 }} onPress={() => setConfirmDelete(!confirmDelete)}>
                             <X size={SIZES.body2} stroke={COLORS.white}/>
                             <Text style={[styles.menuText, { color: COLORS.white }]}>Cancel</Text>
                         </TouchableOpacity>
                         
-                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.accent, borderWidth: 1,  borderColor: COLORS.accent, padding: 5, borderRadius: 50, paddingHorizontal: 40  }} onPress={onLogout}>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.accent, borderWidth: 1,  borderColor: COLORS.accent, padding: 5, borderRadius: 50, paddingVertical: 10, paddingHorizontal: 40  }} onPress={onLogout}>
                             <CheckIcon size={SIZES.body2} stroke={COLORS.text} />
                             <Text style={[styles.menuText, { color: COLORS.text }]}>Confirm Logout</Text>
                         </TouchableOpacity>

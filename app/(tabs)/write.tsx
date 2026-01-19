@@ -1,19 +1,39 @@
-import { View, Text, KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useContext, useState } from 'react'
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native'
+import React, { useState } from 'react'
 import { useRouter } from 'expo-router';
 import Header from '@/components/Header';
 import { COLORS } from '@/constants/colors';
 import { SIZES } from '@/constants/sizes';
 import { useCreatePost } from "@/hooks/useCreatePost"
+import * as ImagePicker from 'expo-image-picker';
+import { Image as ImageIcon } from 'lucide-react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const Write = () => {
     const [title, setTitle] = useState('');
     const [post, setPost] = useState('');
+    const [image, setImage] = useState<string | null>(null);
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const tabBarHeight = useBottomTabBarHeight()
+
     const router = useRouter()
     const { mutate, isPending, isSuccess } = useCreatePost();
+
+    // image picker function 
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    }
 
     // Handle login logic here
     const handlePost = async () => {
@@ -25,16 +45,37 @@ const Write = () => {
                 return { success: false, error: 'Validation error' };
             }
 
-            // Call the createPost mutation
-            mutate({ title, content: post }, {
-              onSuccess: (newPost) => {
-                  
-                  setMessage('Post published successfully!');
-                  setTitle('');
-                  setPost('');
+            const formData = new FormData(); // Create a FormData object
 
-                  // Delay navigation slightly so user sees the success message
-                      router.replace('/(tabs)');
+            formData.append('title', title);
+            formData.append('content', post);
+
+            const uriParts = image?.split('.');
+            const fileType = uriParts ? uriParts[uriParts.length - 1] : null;
+
+            if (image) {
+                const file = {
+                    uri: Platform.OS === 'ios' ? image.replace('file://', '') : image,
+                    name: `photo.${fileType}`,
+                    type: `image/${fileType}`,
+                } as any; // Cast to `any` to avoid type issues
+
+                formData.append('imgUrl', file); // Append the image file to the FormData
+            }
+
+
+            // Call the createPost mutation
+            mutate(formData, {
+              onSuccess: (newPost) => {
+                console.log(formData)
+                  
+                setMessage('Post published successfully!');
+                setTitle('');
+                setPost('');
+                setImage(null);
+
+                // Delay navigation slightly so user sees the success message
+                router.replace('/(tabs)');
               },
               onError: (err) => {
                   setMessage(err.message || 'An error occurred. Please try again.');
@@ -50,7 +91,7 @@ const Write = () => {
     
   return (
     <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingBottom: tabBarHeight }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
@@ -105,7 +146,7 @@ const Write = () => {
                       style={{
                           flex: 1,
                           color: COLORS.primary,
-                          fontFamily: 'bold',
+                          fontFamily: 'regular',
                           fontSize: SIZES.font,
                       }}
                       readOnly={isLoading}
@@ -140,11 +181,35 @@ const Write = () => {
                           textAlignVertical: 'top',
                           fontFamily: 'regular',
                           fontSize: SIZES.font,
-                          height: 250,
+                          height: 200,
                       }}
                       readOnly={isLoading}
                   />
               </View>
+              
+              <TouchableOpacity 
+                onPress={pickImage}
+                style={image && {
+                    height: 200,
+                    backgroundColor: COLORS.secondary,
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor: COLORS.primary,
+                    borderStyle: 'dashed',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    overflow: 'hidden'
+                }}
+              >
+                {image ? (
+                    <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                        <ImageIcon size={30} strokeWidth={0.75} color={COLORS.primary}/>
+                        <Text style={{ color: COLORS.primary, fontFamily: 'regular' }}>Add a Cover Image</Text>
+                    </View>
+                )}
+              </TouchableOpacity>
 
               {/* Publish Button */}
               <TouchableOpacity

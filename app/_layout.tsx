@@ -4,6 +4,8 @@ import { SplashScreen, Stack, useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import * as Font from 'expo-font';
 import { AuthContext, AuthProvider } from "@/context/AuthContext";
+import { StatusBar } from "react-native";
+import { COLORS } from "@/constants/colors";
 
 
 

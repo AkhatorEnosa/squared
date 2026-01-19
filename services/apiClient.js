@@ -15,7 +15,6 @@ export const apiClient = async (endpoint, options = {}) => {
 
   // default headers
   const headers = {
-    'Content-Type': 'application/json',
     ...options.headers,
   };
 
@@ -24,13 +23,32 @@ export const apiClient = async (endpoint, options = {}) => {
     headers['Authorization'] = `${token}`;
   }
 
+  // Only set 'application/json' if the body is NOT FormData.
+  // If it is FormData, we delete Content-Type.
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  } else {
+    // Ensure we don't accidentally have a Content-Type left over from options.headers
+    delete headers['Content-Type'];
+  }
+
   const config = {
     ...options,
     headers,
   };
 
   const response = await fetch(`${API_URL}${endpoint}`, config);
-  const data = await response.json();
+
+  const contentType = response.headers.get('content-type');
+  
+  let data;
+
+  // handle response parsing based on content type
+  if (contentType && contentType.includes("application/json")) {
+    data = await response.json();
+  } else {
+    data = await response.text();
+  }
 
   // Fetch doesn't throw on 404 or 500, so we handle it manually
   if (!response.ok) {

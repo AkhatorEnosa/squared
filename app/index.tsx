@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl, FlatList } from 'react-native'
+import React, { useContext, useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import Header from '@/components/Header'
 import Post from '@/components/Post'
@@ -7,6 +7,7 @@ import { SIZES } from '@/constants/sizes'
 import { usePosts } from '@/hooks/usePosts'
 import { PostType } from '@/types/PostType'
 import NoPost from '@/components/NoPost'
+import { AuthContext } from '@/context/AuthContext'
 
 const Welcome = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -14,6 +15,8 @@ const Welcome = () => {
   const { useGetPosts, invalidatePosts } = usePosts()
 
   const { data: posts, isFetching, isLoading, isError, error } = useGetPosts();
+
+  const { userToken } = useContext(AuthContext)
 
   // on Refresh 
   const onRefresh = () => {
@@ -39,13 +42,20 @@ const Welcome = () => {
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
             <ActivityIndicator size="large" color={COLORS.primary}/>
           </View> :
-          <ScrollView
+          <FlatList<PostType>
+            data={posts}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={null} />}
+            ListEmptyComponent={<NoPost />} // Handles empty state
+            maintainVisibleContentPosition={{
+              autoscrollToTopThreshold: 0,
+              minIndexForVisible: 0,
+            }}
             contentContainerStyle={{
+              gap: 10,
               paddingHorizontal: 15,
               paddingTop: 30,
-              paddingBottom: 30,
-              flexGrow: 1,
-              gap: 10
+              paddingBottom: 30
             }}
             refreshControl={
               <RefreshControl
@@ -55,20 +65,7 @@ const Welcome = () => {
                 colors={[COLORS.primary]}
               />
             }
-          >
-            {!posts || posts.length === 0 ?
-              <NoPost /> :
-              <>
-                <Text style={{ fontSize: SIZES.h4, fontFamily: "bold", }}>Hot Topics</Text>
-
-                <View style={{ flex: 1, gap: 10 }}>
-                  {posts && posts?.map((post: PostType) => (
-                    <Post key={post.id} post={post} />
-                  ))}
-                </View>
-              </>
-            }
-          </ScrollView>
+          />
       }
     </View>
   )
