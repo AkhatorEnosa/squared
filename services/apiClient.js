@@ -44,7 +44,7 @@ export const apiClient = async (endpoint, options = {}) => {
   let data;
 
   // handle response parsing based on content type
-  if (contentType && contentType.includes("application/json")) {
+  if (contentType?.includes("application/json")) {
     data = await response.json();
   } else {
     data = await response.text();
@@ -53,6 +53,7 @@ export const apiClient = async (endpoint, options = {}) => {
   // Fetch doesn't throw on 404 or 500, so we handle it manually
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.log('data', data)
     throw new Error(errorData.message || 'Network response was not ok');
   }
   return data;

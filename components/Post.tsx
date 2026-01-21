@@ -26,6 +26,7 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
 
     const router = useRouter()
     
+    // Function to format post time
     const formatPostTime = (createdAt: Date) => {
         const dist = formatDistanceToNow(new Date(createdAt), {
             addSuffix: false,
@@ -42,6 +43,7 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
         return dist + ' ago';
     }
 
+    // Handle reactions with optimistic UI update
     const handleReactions = () => {
         if (!userToken) {
             // relocate if not logged in
@@ -62,12 +64,26 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
         
     }
 
+    // Handle post deletion
     const handleDelete = (postId: string | number) => {
         deletePost(postId, {
             onSuccess: () => {
                 console.log('Post deleted succesfully')
             },
         })
+    }
+
+    // Append item to URL at specific position
+    const appendItemToUrl =  (url : string, item : string) => {
+        const checkUrl = url.includes('res.cloudinary.com');
+        if (!checkUrl) {
+            return url;
+        } else {
+            const urlParts = url.split('/');
+            urlParts.splice(6, 0, item);
+            const newUrl = urlParts.join('/');
+            return newUrl;
+        }
     }
 
   return (
@@ -97,7 +113,7 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
             {post.imageUrl && 
                  <View style={{ width: '100%', height: 290, borderRadius: 20, borderColor: COLORS.shadow, borderWidth: 1, overflow: 'hidden' }}>
                     <Image
-                        source={{ uri: post.imageUrl }}
+                        source={{ uri: `${appendItemToUrl(post.imageUrl!, 'q_auto/f_auto')}` }}
                         style={{ width: '100%', height: 290, resizeMode: 'cover' }}
                     />
                  </View>
