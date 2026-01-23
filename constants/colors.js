@@ -1,6 +1,7 @@
 export const COLORS = {
   primary: "#019874",
   secondary: "#F8FEFC",
+  saveColor: "#1988ff",
   text: "#000000",
   error: "#FF0000",
   inputText: "019874",

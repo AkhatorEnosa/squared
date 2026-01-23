@@ -8,6 +8,7 @@ import { usePosts } from '@/hooks/usePosts'
 import { PostType } from '@/types/PostType'
 import NoPost from '@/components/NoPost'
 import { AuthContext } from '@/context/AuthContext'
+import ErrorScreen from '@/components/ErrorScreen'
 
 const Welcome = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -29,8 +30,7 @@ const Welcome = () => {
 
   // Handle error state
   if (isError) {
-    console.log('Error fetching posts', error)
-    return ( <Text>Error loading posts...</Text> )
+    return (<ErrorScreen error={error.message} onRetry={() => invalidatePosts()} />)
   }
 
   return (

@@ -1,11 +1,11 @@
 import { View, Text, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import moment from 'moment';
 import { formatDistanceToNow } from "date-fns";
 import { COLORS } from '@/constants/colors'
 import { Link, useRouter } from 'expo-router'
 import { SIZES } from '@/constants/sizes'
-import { CheckIcon, Eye, Heart, Trash, X } from 'lucide-react-native'
+import { Bookmark, CheckIcon, Eye, Heart, Trash, X } from 'lucide-react-native'
 import { PostType } from '@/types/PostType'
 import { SvgUri } from 'react-native-svg';
 import { TooltipWrapper } from './TooltipWrapper';
@@ -20,11 +20,17 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
     const { data: reactions } = usePostReactions(post?.id);
 
     const [ confirmDelete, setConfirmDelete ] = useState<boolean>(false)
-    const [ isLiked,  setIsLiked ] = useState<boolean>(userId ? reactions?.some((reaction: any) => reaction.userId === userId) : false)
-    const [ optimisticLikes, setOptimisticLikes ] = useState<number>(reactions?.length || 0)
+    const [ isLiked,  setIsLiked ] = useState<boolean>(false)
+    const [ optimisticLikes, setOptimisticLikes ] = useState<number>(0)
 
 
     const router = useRouter()
+    
+    // run usepostReactions component mounts
+    useMemo(() => {
+        setIsLiked(userId ? reactions?.some((reaction: any) => reaction.userId === userId) : false);
+        setOptimisticLikes(reactions?.length || 0);
+    }, [reactions, userId]);
     
     // Function to format post time
     const formatPostTime = (createdAt: Date) => {
@@ -89,6 +95,7 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
   return (
     <TouchableOpacity 
         style={{ 
+            backgroundColor: COLORS.gray, 
             paddingHorizontal: 10, 
             paddingVertical: 16,
             gap: 10,
@@ -106,17 +113,18 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
             </TooltipWrapper>
         </View>
           
-        <View style={{ width: '100%', flex: 1, gap: 10, overflow: 'hidden' }}>
-            <Text style={{width: '100%', fontSize: SIZES.body4, color: COLORS.text, fontFamily: "regular" }}>
+        <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', overflow: 'hidden' }}>
+            <Text style={{width: post.imageUrl ? '66%' : '100%', fontSize: SIZES.body4, color: COLORS.text, fontFamily: "regular" }}>
                 {post.content}
             </Text>
-            {post.imageUrl && 
-                 <View style={{ width: '100%', height: 290, borderRadius: 20, borderColor: COLORS.shadow, borderWidth: 1, overflow: 'hidden' }}>
+            {
+                post.imageUrl && 
+                <View style={{ width: '30%', height: 100, borderRadius: 15, borderColor: COLORS.shadow, borderWidth: 1, overflow: 'hidden' }}>
                     <Image
                         source={{ uri: `${appendItemToUrl(post.imageUrl!, 'q_auto/f_auto')}` }}
-                        style={{ width: '100%', height: 290, resizeMode: 'cover' }}
+                        style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
                     />
-                 </View>
+                </View>
             }
         </View>
         
@@ -126,10 +134,19 @@ const Post = ({ post, userToken, userId }: { post: PostType, userToken: boolean,
                     <MessageCircle size={SIZES.body4}/>
                     <Text style={{ fontSize: SIZES.body4, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
                 </View> */}
+                {/* Like button  */}
                 <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
                     <Heart size={SIZES.body4} fill={isLiked ? COLORS.accent : "transparent"} stroke={isLiked ? COLORS.accent : COLORS.text} />
                     <Text style={{ fontSize: SIZES.body4, color: isLiked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ userId ? optimisticLikes : reactions?.length }</Text>
                 </TouchableOpacity>
+                
+                {/* Save Post  */}
+                <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
+                    <Bookmark size={SIZES.body4} fill={isLiked ? COLORS.saveColor : "transparent"} stroke={isLiked ? COLORS.saveColor : COLORS.text} />
+                    <Text style={{ fontSize: SIZES.body4, color: isLiked ? COLORS.saveColor : COLORS.textLight, fontWeight: 'medium' }}>{ userId ? optimisticLikes : reactions?.length }</Text>
+                </TouchableOpacity>
+                
+                {/* views count  */}
                 <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
                     <Eye size={SIZES.body4} />
                     <Text style={{ fontSize: SIZES.body4, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>

@@ -1,14 +1,16 @@
-import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useContext, useState } from 'react'
+import { View, Text, Image, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native'
+import React, { useMemo, useState } from 'react'
 import { COLORS } from '@/constants/colors'
-import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
 import { SIZES } from '@/constants/sizes';
-import { Eye, Heart, MessageCircle } from 'lucide-react-native';
+import { Bookmark, CheckIcon, Eye, Heart, Trash, X } from 'lucide-react-native';
 import { PostType } from '@/types/PostType';
 import moment from 'moment';
 import { formatDistanceToNow } from 'date-fns';
 import { TooltipWrapper } from './TooltipWrapper';
+import useAddReaction from '@/hooks/useAddReaction';
+import useDeletePost from '@/hooks/useDeletePost';
+import { useGetReactions } from '@/hooks/useGetReactions';
 
 // Get screen width dynamically
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -16,15 +18,20 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Adjust for the 15px horizontal padding in your Home.tsx parent container
 const CARD_WIDTH = SCREEN_WIDTH - 60; 
 
-interface FeaturedProps {
-    post?: PostType; 
-}
+const Featured = ({ post, userToken, userId }: { post: PostType, userToken: boolean, userId: string | null }) => {
+    const { mutate: reactToPost } = useAddReaction();
+    const { mutate: deletePost, isPending } = useDeletePost();
+    const { usePostReactions } = useGetReactions();
+    const { data: reactions, isFetching } = usePostReactions(post?.id);
 
-const Featured = ({ post }: FeaturedProps) => {
-    const [liked, setLiked] = useState(false)
-
+    const [ confirmDelete, setConfirmDelete ] = useState<boolean>(false)
+    const [isLiked, setIsLiked] = useState<boolean>(false)
+    const [optimisticLikes, setOptimisticLikes] = useState<number>(0)
+    
+    
+    const router = useRouter()
         
-    function formatPostTime(createdAt: Date) {
+    const formatPostTime = (createdAt: Date) => {
         const dist = formatDistanceToNow(new Date(createdAt), {
             addSuffix: false,
         });
@@ -38,6 +45,36 @@ const Featured = ({ post }: FeaturedProps) => {
         }
 
         return dist + ' ago';
+    }
+
+    // Handle reactions with optimistic UI update
+    const handleReactions = () => {
+        if (!userToken) {
+            // relocate if not logged in
+            router.replace('/(auth)/login')
+            return
+        }
+
+        try {
+            setIsLiked(!isLiked);
+            setOptimisticLikes(isLiked ? optimisticLikes - 1 : optimisticLikes + 1);
+            
+            reactToPost({ postId: post.id, type: isLiked ? 'LIKE' : 'LIKE' });
+        } catch (error) {
+            setOptimisticLikes(reactions.length);
+            setIsLiked(reactions?.some((reaction: any) => reaction.userId === userId));
+            console.log(error)
+        }
+        
+    }
+
+    // Handle post deletion
+    const handleDelete = (postId: string | number) => {
+        deletePost(postId, {
+            onSuccess: () => {
+                console.log('Post deleted succesfully')
+            },
+        })
     }
 
     return (
@@ -76,18 +113,38 @@ const Featured = ({ post }: FeaturedProps) => {
             
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: !post?.imageUrl ? 15 : 'auto' }}>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
-                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-                        <MessageCircle size={18} color={COLORS.textLight}/>
-                        <Text style={{ fontSize: 13, color: COLORS.textLight }}>300</Text>
-                    </View>
-                    <TouchableOpacity style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }} onPress={() => setLiked(!liked)}>
-                        <Heart size={18} fill={liked ? COLORS.accent : 'transparent'} stroke={liked ? COLORS.accent : COLORS.textLight} />
-                        <Text style={{ fontSize: 13, color: liked ? COLORS.accent : COLORS.textLight }}>800</Text>
+                    {/* <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
+                    <MessageCircle size={SIZES.body3}/>
+                    <Text style={{ fontSize: SIZES.body3, color: COLORS.textLight, fontWeight: 'medium' }}>300</Text>
+                    </View> */}
+
+                    {/* Like button  */}
+                    <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
+                        <Heart size={SIZES.body3} fill={isLiked ? COLORS.accent : "transparent"} stroke={isLiked ? COLORS.accent : COLORS.text} />
+                        <Text style={{ fontSize: SIZES.body3, color: isLiked ? COLORS.accent : COLORS.textLight, fontWeight: 'medium' }}>{ userId ? optimisticLikes : reactions?.length }</Text>
                     </TouchableOpacity>
-                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-                        <Eye size={18} color={COLORS.textLight} />
-                        <Text style={{ fontSize: 13, color: COLORS.textLight }}>1.1k</Text>
+                    
+                    {/* Save Post  */}
+                    <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => handleReactions()}>
+                        <Bookmark size={SIZES.body3} fill={isLiked ? COLORS.saveColor : "transparent"} stroke={isLiked ? COLORS.saveColor : COLORS.text} />
+                        <Text style={{ fontSize: SIZES.body3, color: isLiked ? COLORS.saveColor : COLORS.textLight, fontWeight: 'medium' }}>{ userId ? optimisticLikes : reactions?.length }</Text>
+                    </TouchableOpacity>
+                    
+                    {/* views count  */}
+                    <View style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }}>
+                        <Eye size={SIZES.body3} />
+                        <Text style={{ fontSize: SIZES.body3, color: COLORS.textLight, fontWeight: 'medium' }}>1.1k</Text>
                     </View>
+                    {
+                        userId === post.author.id && 
+                        <TouchableOpacity style={{ flexDirection: 'row', gap: 4.25, alignItems: 'center', width: 'auto' }} onPress={() => confirmDelete ? handleDelete(post?.id) : setConfirmDelete(!confirmDelete)}>
+                            <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' , display: confirmDelete ? 'flex' : 'none' }}>
+                                <X size={SIZES.body3} fill={COLORS.shadow} onPress={() => setConfirmDelete(!confirmDelete)} />
+                                {isPending ? <ActivityIndicator color={COLORS.shadow} /> : <CheckIcon size={SIZES.body3} stroke={COLORS.accent} />}
+                            </View>
+                            <Trash size={SIZES.body3} fill={COLORS.shadow} style={{ display: confirmDelete ? 'none' : 'flex' }} />
+                        </TouchableOpacity>
+                    }
                 </View>
 
                 <TooltipWrapper text={post && formatPostTime(post.createdAt).split(".")[0]}>

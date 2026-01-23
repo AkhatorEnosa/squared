@@ -20,25 +20,13 @@ const Home = () => {
   const { useUser } = useGetUser();
   const { data:user } = useUser();
 
-  const { data: posts, isFetching, isLoading, isError } = useGetPosts();
+  const { data: posts, isFetching, isLoading } = useGetPosts();
 
   const { userToken } = useContext(AuthContext)
     
   const tabBarHeight = useBottomTabBarHeight()
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-  // verify Liked posts
-  const verifyLike = (postId: string | number) => {
-    if (!user || !posts) return false;
-
-    const post = posts.find((p: PostType) => p.id === postId);
-    if (!post || !post.reactions) return false;
-
-    // Check if the user has liked the post
-    return post.reactions.some((reaction: any) => reaction.userId === user.id);
-  }
-
 
   useEffect(() => {
     if (posts) {
@@ -58,11 +46,6 @@ const Home = () => {
     setIsRefreshing(false);
   }
 
-  // Handle error state
-  if (isError) {
-    return ( <Text>Error loading posts...</Text> )
-  }
-
   const renderHeader = () => (
     <View style={{ marginBottom: 20 }}>
       <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.text, marginBottom: 20 }}>
@@ -76,7 +59,7 @@ const Home = () => {
         keyExtractor={(item) => `featured-${item.id}`}
         renderItem={({ item }) => (
           <View style={{ alignItems: 'flex-start' }}>
-            <Featured post={item} />
+            <Featured userToken={userToken} userId={user?.id} post={item} />
           </View>
         )}
         showsHorizontalScrollIndicator={false}
@@ -106,7 +89,7 @@ const Home = () => {
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <Post post={item} userToken={userToken} userId={user?.id} />}
+          renderItem={({ item }) => <Post post={item} userToken={userToken} userId={user?.id} />}
           ListHeaderComponent={renderHeader} // Renders Featured Posts
           ListEmptyComponent={<NoPost />} // Handles empty state
           maintainVisibleContentPosition={{
@@ -117,7 +100,8 @@ const Home = () => {
             gap: 10,
             paddingHorizontal: 15,
             paddingTop: 30,
-            paddingBottom: tabBarHeight + 30
+            paddingBottom: tabBarHeight + 30,
+            backgroundColor: COLORS.secondary
           }}
           refreshControl={
             <RefreshControl

@@ -8,6 +8,7 @@ import { useGetUser } from '@/hooks/useGetUser';
 import { SvgUri } from 'react-native-svg';
 import { View } from 'react-native';
 import { ProfileModal } from '@/components/ProfileModal';
+import ErrorScreen from '@/components/ErrorScreen';
 
 const TabsLayout = () => {
   const [profileModalVisible, setProfileModalVisible] = useState<boolean>(false);
@@ -15,7 +16,7 @@ const TabsLayout = () => {
   const { userToken, logout } = useContext(AuthContext)
   const router = useRouter();
 
-  const { useUser } = useGetUser();
+  const { useUser, invalidateUser } = useGetUser();
 
   const { data: user, isFetching, isLoading, isError, error } = useUser();
   
@@ -29,7 +30,7 @@ const TabsLayout = () => {
   // Handle error state
   if (isError) {
     console.log('Error fetching user', error)
-    // return ( <Text>Error loading posts...</Text> )
+    return (<ErrorScreen error={error.message} onRetry={() => invalidateUser()} />)
   }
   
   

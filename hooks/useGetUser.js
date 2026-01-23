@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiClient } from "../services/apiClient";
 
 export const useGetUser = () => {
+    const queryClient = useQueryClient();
 
     // Fetch user profile
     const useUser = () => {
@@ -15,5 +16,9 @@ export const useGetUser = () => {
         })
     }
 
-    return { useUser };
+    const invalidateUser = () => {
+        queryClient.invalidateQueries(["user"]);
+    };
+
+    return { useUser, invalidateUser };
 }
